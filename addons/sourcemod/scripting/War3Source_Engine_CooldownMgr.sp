@@ -20,19 +20,19 @@ new Handle:g_CooldownExpiredForwardHandle;
 
 new CooldownPointer[MAXPLAYERSCUSTOM][MAXRACES][MAXSKILLCOUNT];
 
-enum CooldownClass
+enum struct CooldownClass
 {
-    Float:cexpiretime,
-    cclient,
-    crace,
-    cskill,
-    bool:cexpireonspawn,
-    bool:cprintmsgonexpire,
-    cnext,
+    float cexpiretime;
+    int cclient;
+    int crace;
+    int cskill;
+    bool cexpireonspawn;
+    bool cprintmsgonexpire;
+    int cnext;
 }
 
 #define MAXCOOLDOWNS 64*2
-new Cooldown[MAXCOOLDOWNS][CooldownClass];
+CooldownClass Cooldown[MAXCOOLDOWNS];
 
 #define MAXTHREADS 2000
 new Float:expireTime[MAXTHREADS];
@@ -154,7 +154,7 @@ public Native_War3_CooldownRMN(Handle:plugin,numParams) //cooldown remaining tim
         
         new index=GetCooldownIndexByCRS(client,raceid,skillNum);
         if(index>0){
-            return RoundToCeil(Cooldown[index][cexpiretime]-GetEngineTime());
+            return RoundToCeil(Cooldown[index].cexpiretime-GetEngineTime());
         }
         return _:0.0;
     }
@@ -214,10 +214,10 @@ ClearAllCooldowns()
             ///we just dump the entire linked list
     for(new i=0;i<MAXCOOLDOWNS;i++){
         //we need to "unenable" aka free each cooldown
-        Cooldown[i][cexpiretime]=0.0;
+        Cooldown[i].cexpiretime=0.0;
         
     }
-    Cooldown[0][cnext]=0;
+    Cooldown[0].cnext=0;
     
     
     for(new i=1;i<=MaxClients;i++)
@@ -247,7 +247,7 @@ Internal_CreateCooldown(client,Float:cooldownTime,raceid,skillNum,bool:resetOnSp
     }
     else{
         for(new i=1;i<MAXCOOLDOWNS;i++){
-            if(Cooldown[i][cexpiretime]<1.0){ //consider this one empty
+            if(Cooldown[i].cexpiretime<1.0){ //consider this one empty
                 indextouse=i;
                 break;
                 
@@ -263,16 +263,16 @@ Internal_CreateCooldown(client,Float:cooldownTime,raceid,skillNum,bool:resetOnSp
     else{
         if(createlinks){ //if u create links again and u are already link from the prevous person, u will infinite loop
         
-            Cooldown[indextouse][cnext]=Cooldown[indextouse-1][cnext]; //this next is the previous guy's next
-            Cooldown[indextouse-1][cnext]=indextouse; //previous guy points to you
+            Cooldown[indextouse].cnext=Cooldown[indextouse-1].cnext; //this next is the previous guy's next
+            Cooldown[indextouse-1].cnext=indextouse; //previous guy points to you
         }
         
-        Cooldown[indextouse][cexpiretime]=GetEngineTime()+cooldownTime;
-        Cooldown[indextouse][cclient]=client;
-        Cooldown[indextouse][crace]=raceid;
-        Cooldown[indextouse][cskill]=skillNum;
-        Cooldown[indextouse][cexpireonspawn]=resetOnSpawn;
-        Cooldown[indextouse][cprintmsgonexpire]=printMsgOnExpireByTime;
+        Cooldown[indextouse].cexpiretime=GetEngineTime()+cooldownTime;
+        Cooldown[indextouse].cclient=client;
+        Cooldown[indextouse].crace=raceid;
+        Cooldown[indextouse].cskill=skillNum;
+        Cooldown[indextouse].cexpireonspawn=resetOnSpawn;
+        Cooldown[indextouse].cprintmsgonexpire=printMsgOnExpireByTime;
 
         CooldownPointer[client][raceid][skillNum]=indextouse;
     }
@@ -291,15 +291,15 @@ CheckCooldownsForExpired(bool:expirespawn,clientthatspawned=0)
     new Handle:arraylist[MAXPLAYERSCUSTOM]; //hint messages will be attached to an arraylist
     
     for(new i=0;i<MAXCOOLDOWNS;i++){
-        if(Cooldown[i][cexpiretime]>1.0) //enabled
+        if(Cooldown[i].cexpiretime>1.0) //enabled
         {
             new bool:expired;
             new bool:bytime;
-            if(currenttime>Cooldown[i][cexpiretime]){
+            if(currenttime>Cooldown[i].cexpiretime){
                 expired=true;
                 bytime=true;
             }
-            else if(expirespawn&&Cooldown[i][cclient]==clientthatspawned&&Cooldown[i][cexpireonspawn]){
+            else if(expirespawn&&Cooldown[i].cclient==clientthatspawned&&Cooldown[i].cexpireonspawn){
                 expired=true;
             }
             
@@ -308,25 +308,25 @@ CheckCooldownsForExpired(bool:expirespawn,clientthatspawned=0)
             {
                 //PrintToChatAll("EXPIRED");
                 CooldownExpired(i, bytime);
-                Cooldown[i][cexpiretime]=0.0;
+                Cooldown[i].cexpiretime=0.0;
                 
                 if(i>0){ //not front do some pointer changes, shouldnt be front anyway
-                    Cooldown[skippedfrom][cnext]=Cooldown[i][cnext];
-                    //PrintToChatAll("changing next at %d to %d",skippedfrom,Cooldown[i][cnext]);
+                    Cooldown[skippedfrom].cnext=Cooldown[i].cnext;
+                    //PrintToChatAll("changing next at %d to %d",skippedfrom,Cooldown[i].cnext);
                     
                     
                 }
                 
-                //PrintToChatAll("CD expired %d %d %d",Cooldown[i][cclient],Cooldown[i][crace],Cooldown[i][cskill]);
+                //PrintToChatAll("CD expired %d %d %d",Cooldown[i].cclient,Cooldown[i].crace,Cooldown[i].cskill);
                 
                 i=skippedfrom;
             }
             else{
-                new client=Cooldown[i][cclient];
-                new race=Cooldown[i][crace];
-                new skill=Cooldown[i][cskill];
-                new timeremaining=RoundToCeil(Cooldown[i][cexpiretime]-GetEngineTime());
-                if(War3_GetRace(client)==Cooldown[i][crace] && War3_GetSkillLevel(client,race,skill)>0&& timeremaining<=5 && Cooldown[i][cprintmsgonexpire]==true){ //is this race, and has this skill
+                new client=Cooldown[i].cclient;
+                new race=Cooldown[i].crace;
+                new skill=Cooldown[i].cskill;
+                new timeremaining=RoundToCeil(Cooldown[i].cexpiretime-GetEngineTime());
+                if(War3_GetRace(client)==Cooldown[i].crace && War3_GetSkillLevel(client,race,skill)>0&& timeremaining<=5 && Cooldown[i].cprintmsgonexpire==true){ //is this race, and has this skill
                     
                     if(arraylist[client]==INVALID_HANDLE){
                         arraylist[client]=CreateArray(ByteCountToCells(128));
@@ -334,13 +334,13 @@ CheckCooldownsForExpired(bool:expirespawn,clientthatspawned=0)
                     new String:str[128];
                     SetTrans(client);
                     new String:skillname[32];
-                    W3GetRaceSkillName(Cooldown[i][crace],Cooldown[i][cskill],skillname,sizeof(skillname));
+                    W3GetRaceSkillName(Cooldown[i].crace,Cooldown[i].cskill,skillname,sizeof(skillname));
                     Format(str,sizeof(str),"%s%s: %d",GetArraySize(arraylist[client])>0?"\n":"",skillname,timeremaining);
                     PushArrayString(arraylist[client],str);
                 }
             }
         }
-        tempnext=Cooldown[i][cnext];
+        tempnext=Cooldown[i].cnext;
     
         if(tempnext==0){
             //PrintToChatAll("DeciSecondTimer break because next is zero at index %d",i);
@@ -378,18 +378,18 @@ CheckCooldownsForExpired(bool:expirespawn,clientthatspawned=0)
 
 CooldownResetByCRS(client,raceid,skillnum){
     if(CooldownPointer[client][raceid][skillnum]>0){
-        Cooldown[CooldownPointer[client][raceid][skillnum]][cexpiretime]=GetEngineTime(); ///lol
+        Cooldown[CooldownPointer[client][raceid][skillnum]].cexpiretime=GetEngineTime(); ///lol
     }
 }
 CooldownExpired(i,bool:expiredByTimer)
 {    
-    new client=Cooldown[i][cclient];
-    new raceid=Cooldown[i][crace];
-    new skillNum=Cooldown[i][cskill];
+    new client=Cooldown[i].cclient;
+    new raceid=Cooldown[i].crace;
+    new skillNum=Cooldown[i].cskill;
     CooldownPointer[client][raceid][skillNum]=-1;
 
     if(expiredByTimer){
-        if(ValidPlayer(client,true)&&Cooldown[i][cprintmsgonexpire]&& (  (War3_GetRace(client)==raceid)) ){ //if still the same race and alive
+        if(ValidPlayer(client,true)&&Cooldown[i].cprintmsgonexpire&& (  (War3_GetRace(client)==raceid)) ){ //if still the same race and alive
             if(War3_GetSkillLevel(client,raceid,skillNum)>0){
             
                 new String:skillname[64];
@@ -432,9 +432,9 @@ GetCooldownIndexByCRS(client,raceid,skillNum){
 }
 
 public Internal_PrintSkillNotAvailable(cooldownindex){
-    new client=Cooldown[cooldownindex][cclient];
-    new race=Cooldown[cooldownindex][crace];
-    new skill=Cooldown[cooldownindex][cskill];
+    new client=Cooldown[cooldownindex].cclient;
+    new race=Cooldown[cooldownindex].crace;
+    new skill=Cooldown[cooldownindex].cskill;
     if(ValidPlayer(client,true)){
         new String:skillname[64];
         SetTrans(client);

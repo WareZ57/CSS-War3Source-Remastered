@@ -1,7 +1,7 @@
 #pragma semicolon 1    ///WE RECOMMEND THE SEMICOLON
 #include <sourcemod>
 #undef REQUIRE_EXTENSIONS
-#include "W3SIncs/steamtools"
+#include "W3SIncs/SteamWorks"
 #include <cstrike>
 #define REQUIRE_EXTENSIONS
 #include "W3SIncs/War3Source_Interface"
@@ -19,20 +19,20 @@ new Handle:g_hGOMultipler = INVALID_HANDLE;
 new Handle:g_hXPMultipler = INVALID_HANDLE;
 new Handle:g_hVarWelcomeMsg = INVALID_HANDLE;
 
-new bool:g_bSteamTools = false;
+new bool:g_bSteamWorks = false;
 new bool:bIsInGroup[MAXPLAYERSCUSTOM] = false;
 
 public OnPluginStart()
 {
     // Revan: I'm using seperate convar names because theese are also separate values and generic clantags might be prefered
     // Problems getting GroupID? see this: http://forums.alliedmods.net/showpost.php?p=1226621&postcount=11 .. example id: 2488793
-    g_hClanID = CreateConVar("war3_bonusclan_id","0","If GroupID is non-zero the plugin will use steamtools to identify clan players(Overrides 'war3_bonusclan_name')");
+    g_hClanID = CreateConVar("war3_bonusclan_id","0","If GroupID is non-zero the plugin will use SteamWorks to identify clan players(Overrides 'war3_bonusclan_name')");
     g_hClanVar = CreateConVar("war3_bonusclan_name","War3","Player who are wearing this clantag will gain bonus XP");
     g_hXPMultipler = CreateConVar("war3_bonusclan_xprate","1.2","Bonus XP Multipler", 0, true, 1.0);
     g_hGOMultipler = CreateConVar("war3_bonusclan_goldrate","1.0","Bonus Gold Multipler", 0, true, 1.0);
     g_hVarWelcomeMsg = CreateConVar ("war3_bonusclan_welcome", "1.0", "Enable the welcome message", 0, true, 0.0, true, 1.0);
 
-    // tells if steamtools is loaded and(if used from a client console) if you're member of the war3_bonusclan_id group
+    // tells if SteamWorks is loaded and(if used from a client console) if you're member of the war3_bonusclan_id group
     RegConsoleCmd("war3_bonusclan", Command_TellStatus,"Gives information about your current group status.");
     // refreshes groupcache
     RegServerCmd("war3_bonusclan_refresh", Command_Refresh,"Refresh War3Source groupcache.");
@@ -41,8 +41,19 @@ public OnPluginStart()
 
 public bool:InitNativesForwards()
 {
-    MarkNativeAsOptional("Steam_RequestGroupStatus");
-    return true;  // prevents log errors
+    return true;  // prevents log errors (SteamWorks natives are marked optional by SteamWorks.inc)
+}
+
+public OnAllPluginsLoaded()
+{
+    g_bSteamWorks = LibraryExists("SteamWorks");
+}
+
+public OnLibraryAdded(const String:name[])
+{
+    if(strcmp(name, "SteamWorks")==0) {
+        g_bSteamWorks = true;
+    }
 }
 
 public Action:Command_Refresh(args)
@@ -51,19 +62,20 @@ public Action:Command_Refresh(args)
     {
         if(ValidPlayer(client,false) && IsClientAuthorized(client))
         {
-            Steam_RequestGroupStatus(client, GetConVarInt(g_hClanID));
+            RequestGroupStatus(client);
         }
     }
     PrintToServer("[W3S] Repolling groupstatus...");
+    return Plugin_Handled;
 }
 
 public Action:Command_TellStatus(client,args)
 {
-    if(g_bSteamTools) {
-        ReplyToCommand(client,"[W3S] Steamtools detected!");
+    if(g_bSteamWorks) {
+        ReplyToCommand(client,"[W3S] SteamWorks detected!");
     }
     else {
-        ReplyToCommand(client,"[W3S] Steamtools wasn't recognized!");
+        ReplyToCommand(client,"[W3S] SteamWorks wasn't recognized!");
     }
     if(IS_PLAYER(client)) {
         ReplyToCommand(client,"[W3S] Membership status of Group(%i) is: %s",GetConVarInt(g_hClanID),(bIsInGroup[client]?"member":"nobody"));
@@ -75,11 +87,11 @@ public OnWar3Event(W3EVENT:event,client)
 {
     if(event==OnPreGiveXPGold && !IsFakeClient(client)) {
         new bool:bAwardBonus = false;
-        // Steamtools has highest priority
-        if(check_steamtools()) {
+        // SteamWorks has highest priority
+        if(check_steamworks()) {
             bAwardBonus = bIsInGroup[client];
         }
-        // Check clantag if steamtools isn't available and bonus isn't granted yet
+        // Check clantag if SteamWorks isn't available and bonus isn't granted yet
         else if(GAMECSANY && !bAwardBonus) {
             decl String:buffer[32],String:buffer2[32];
             CS_GetClientClanTag(client,buffer, sizeof(buffer));
@@ -110,12 +122,21 @@ public OnClientPutInServer(client)
     }
     // reset cached group status
     bIsInGroup[client] = false;
-    // repoll
-    if(check_steamtools()) {
-        new iGroupID = GetConVarInt(g_hClanID);
-        if(iGroupID != 0) {
-            Steam_RequestGroupStatus(client, iGroupID);
-        }
+}
+
+// The group status needs the client's SteamID, known once the client is authorized
+public OnClientPostAdminCheck(client)
+{
+    if(!IsFakeClient(client)) {
+        RequestGroupStatus(client);
+    }
+}
+
+RequestGroupStatus(client)
+{
+    new iGroupID = GetConVarInt(g_hClanID);
+    if(check_steamworks() && iGroupID != 0) {
+        SteamWorks_GetUserGroupStatus(client, iGroupID);
     }
 }
 
@@ -160,38 +181,26 @@ public Action:WelcomeAdvertTimer (Handle:timer, any:client)
     return Plugin_Stop;
 }
 
-/* SteamTools */
+/* SteamWorks */
 
-
-public Steam_FullyLoaded()
+// authid is the account ID of the player (GetSteamAccountID), not a client index
+public SteamWorks_OnClientGroupStatus(authid, groupid, bool:isMember, bool:isOfficer)
 {
-    g_bSteamTools = true;
-}
-
-public Steam_Shutdown()
-{
-    g_bSteamTools = false;
-}
-
-public Steam_GroupStatusResult(client, groupID, bool:bIsMember, bool:bIsOfficer)
-{
-    if(groupID == GetConVarInt(g_hClanID)) {
-        bIsInGroup[client] = bIsMember;
+    if(groupid != GetConVarInt(g_hClanID)) {
+        return;
     }
-}
-
-// Checks if steamtools is currently running properly
-stock bool:check_steamtools()
-{
-    /*if(HAS_STEAMTOOLS()) {
-        if(!g_bSteamTools) {
-            LogError("SteamTools was detected but not properly loaded");
-            return false;
+    for(new client=1;client<=MaxClients;client++)
+    {
+        if(IsClientInGame(client) && !IsFakeClient(client) && GetSteamAccountID(client) == authid) {
+            bIsInGroup[client] = isMember;
         }
-        return true;
     }
-    return false;*/
-    return g_bSteamTools;
+}
+
+// Checks if SteamWorks is currently running properly
+stock bool:check_steamworks()
+{
+    return g_bSteamWorks && GetFeatureStatus(FeatureType_Native, "SteamWorks_GetUserGroupStatus") == FeatureStatus_Available;
 }
 
 // This listens for removed libraries and stuff
@@ -199,9 +208,9 @@ public OnLibraryRemoved(const String:name[])
 {
     new iGroupID = GetConVarInt(g_hClanID);
     if(iGroupID != 0) {
-        // Error out if steamtools got unloaded.
-        if(strcmp(name, "SteamTools")==0) {
-            SetFailState("SteamTools has been unloaded!");
+        // Fall back to the clan tag if SteamWorks got unloaded.
+        if(strcmp(name, "SteamWorks")==0) {
+            g_bSteamWorks = false;
         }
     }
     else if(strcmp(name, "cstrike")==0) {

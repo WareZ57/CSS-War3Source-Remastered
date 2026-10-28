@@ -40,7 +40,7 @@ new SkillRedirectedToGSkill[MAXRACES][MAXSKILLCOUNT];
 
 new bool:skillIsUltimate[MAXRACES][MAXSKILLCOUNT];
 new skillMaxLevel[MAXRACES][MAXSKILLCOUNT];
-new skillProp[MAXRACES][MAXSKILLCOUNT][W3SkillProp];
+any skillProp[MAXRACES][MAXSKILLCOUNT][W3SkillProp];
 
 new MinLevelCvar[MAXRACES];
 new AccessFlagCvar[MAXRACES];
@@ -922,16 +922,16 @@ new genericskillcount=0;
 
 //how many skills can use a generic skill, limited for memory
 #define MAXCUSTOMERRACES 32
-enum GenericSkillClass
+enum struct GenericSkillClass
 {
-    String:cskillname[32], 
-    redirectedfromrace[MAXCUSTOMERRACES], //theset start from 0!!!!
-    redirectedfromskill[MAXCUSTOMERRACES],
-    redirectedcount, //how many races are using this generic skill, first is 1, loop from 1 to <=redirected count
-    Handle:raceskilldatahandle[MAXCUSTOMERRACES], //handle the customer races passed us
+    char cskillname[32];
+    int redirectedfromrace[MAXCUSTOMERRACES]; //theset start from 0!!!!
+    int redirectedfromskill[MAXCUSTOMERRACES];
+    int redirectedcount; //how many races are using this generic skill, first is 1, loop from 1 to <=redirected count
+    Handle raceskilldatahandle[MAXCUSTOMERRACES]; //handle the customer races passed us
 }
 //55 generic skills
-new GenericSkill[55][GenericSkillClass];
+GenericSkillClass GenericSkill[55];
 public NWar3_CreateGenericSkill(Handle:plugin,numParams){
     new String:tempgenskillname[32];
     GetNativeString(1,tempgenskillname,32);
@@ -939,14 +939,14 @@ public NWar3_CreateGenericSkill(Handle:plugin,numParams){
     //find existing
     for(new i=1;i<=genericskillcount;i++){
         
-        if(StrEqual(tempgenskillname,GenericSkill[i][cskillname])){
+        if(StrEqual(tempgenskillname,GenericSkill[i].cskillname)){
             return i;
         }
     }
     
     //no existing found, add 
     genericskillcount++;
-    GetNativeString(1,GenericSkill[genericskillcount][cskillname],32);
+    GetNativeString(1,GenericSkill[genericskillcount].cskillname,32);
     return genericskillcount;
 }
 public NWar3_UseGenericSkill(Handle:plugin,numParams){
@@ -956,8 +956,8 @@ public NWar3_UseGenericSkill(Handle:plugin,numParams){
     new Handle:genericSkillData=Handle:GetNativeCell(3);
     //start from 1
     for(new genericskillid=1;genericskillid<=genericskillcount;genericskillid++){
-        //DP("1 %s %s ]",genskillname,GenericSkill[i][cskillname]);
-        if(StrEqual(genskillname,GenericSkill[genericskillid][cskillname])){
+        //DP("1 %s %s ]",genskillname,GenericSkill[i].cskillname);
+        if(StrEqual(genskillname,GenericSkill[genericskillid].cskillname)){
             //DP("2");
             if(raceid>0){
                 
@@ -983,20 +983,20 @@ public NWar3_UseGenericSkill(Handle:plugin,numParams){
                 }
                 
                 //check that the data handle isnt leaking
-                new genericcustomernumber=GenericSkill[genericskillid][redirectedcount];
+                new genericcustomernumber=GenericSkill[genericskillid].redirectedcount;
                 for(new j=0;j<=genericcustomernumber;j++){
                     if(
-                    GenericSkill[genericskillid][redirectedfromrace][j]==raceid
+                    GenericSkill[genericskillid].redirectedfromrace[j]==raceid
                     &&
-                    GenericSkill[genericskillid][redirectedfromskill][j]==newskillnum
+                    GenericSkill[genericskillid].redirectedfromskill[j]==newskillnum
                     )
                     {   //EXISTING
                         //NOTE THE HANDLE IS KILLED IF CUSTOM RACE IS KILLED, therefore dont close here
                         //Since function IsValidHandle is not allowed, we have to assume it was killed
-                        if(GenericSkill[genericskillid][raceskilldatahandle][j]!=INVALID_HANDLE && GenericSkill[genericskillid][raceskilldatahandle][j] !=genericSkillData){
+                        if(GenericSkill[genericskillid].raceskilldatahandle[j]!=INVALID_HANDLE && GenericSkill[genericskillid].raceskilldatahandle[j] !=genericSkillData){
                             //DP("ERROR POSSIBLE HANDLE LEAK, NEW GENERIC SKILL DATA HANDLE PASSED, CLOSING OLD GENERIC DATA HANDLE");
-                            //CloseHandle(GenericSkill[genericskillid][raceskilldatahandle][j]);
-                            GenericSkill[genericskillid][raceskilldatahandle][j]=genericSkillData;
+                            //CloseHandle(GenericSkill[genericskillid].raceskilldatahandle[j]);
+                            GenericSkill[genericskillid].raceskilldatahandle[j]=genericSkillData;
                         }    
                     }
                     
@@ -1017,11 +1017,11 @@ public NWar3_UseGenericSkill(Handle:plugin,numParams){
                     SkillRedirectedToGSkill[raceid][newskillnum]=genericskillid;
                     
                     
-                    GenericSkill[genericskillid][raceskilldatahandle][genericcustomernumber]=genericSkillData;
-                    GenericSkill[genericskillid][redirectedfromrace][GenericSkill[genericskillid][redirectedcount]]=raceid;
+                    GenericSkill[genericskillid].raceskilldatahandle[genericcustomernumber]=genericSkillData;
+                    GenericSkill[genericskillid].redirectedfromrace[GenericSkill[genericskillid].redirectedcount]=raceid;
                     
-                    GenericSkill[genericskillid][redirectedfromskill][GenericSkill[genericskillid][redirectedcount]]=newskillnum;
-                    GenericSkill[genericskillid][redirectedcount]++;
+                    GenericSkill[genericskillid].redirectedfromskill[GenericSkill[genericskillid].redirectedcount]=newskillnum;
+                    GenericSkill[genericskillid].redirectedcount++;
                     //DP("FOUND GENERIC SKILL %d, real skill id for race %d",i,newskillnum);
                 }
                 
@@ -1037,15 +1037,15 @@ public NW3_GenericSkillLevel(Handle:plugin,numParams){
     
     new client=GetNativeCell(1);
     new genericskill=GetNativeCell(2);
-    new count=GenericSkill[genericskill][redirectedcount];
+    new count=GenericSkill[genericskill].redirectedcount;
     new found=0;
     new level=0;
     new reallevel=0;
     new customernumber=0;
     new clientrace=War3_GetRace(client);
     for(new i=0;i<count;i++){
-        if(clientrace==GenericSkill[genericskill][redirectedfromrace][i]){
-            level = War3_GetSkillLevel( client, GenericSkill[genericskill][redirectedfromrace][i], GenericSkill[genericskill][redirectedfromskill][i]);
+        if(clientrace==GenericSkill[genericskill].redirectedfromrace[i]){
+            level = War3_GetSkillLevel( client, GenericSkill[genericskill].redirectedfromrace[i], GenericSkill[genericskill].redirectedfromskill[i]);
             ////if(level)
             //{ 
             found++;
@@ -1059,12 +1059,12 @@ public NW3_GenericSkillLevel(Handle:plugin,numParams){
         return 0;
     }
     if(found){
-        SetNativeCellRef(3,GenericSkill[genericskill][raceskilldatahandle][customernumber]);
+        SetNativeCellRef(3,GenericSkill[genericskill].raceskilldatahandle[customernumber]);
         if(numParams>=4){
-            SetNativeCellRef(4, GenericSkill[genericskill][redirectedfromrace][customernumber]);
+            SetNativeCellRef(4, GenericSkill[genericskill].redirectedfromrace[customernumber]);
         }
         if(numParams>=5){
-            SetNativeCellRef(5, GenericSkill[genericskill][redirectedfromskill][customernumber]);
+            SetNativeCellRef(5, GenericSkill[genericskill].redirectedfromskill[customernumber]);
         }
     }
     return reallevel;

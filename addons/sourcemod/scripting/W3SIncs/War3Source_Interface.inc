@@ -615,12 +615,12 @@ stock W3SetCvarInt(cvarid, intval) {
   Format(str, sizeof(str), "%d", intval);
   return W3SetCvar(cvarid, str);
 }
-stock W3CreateCvarFloat(String:cvarstr[],intval,String:cvardesc[]) {
+stock W3CreateCvarFloat(String:cvarstr[],Float:floatval,String:cvardesc[]) {
   decl String:str[1024];
-  Format(str,sizeof(str),"%f",intval);
+  Format(str,sizeof(str),"%f",floatval);
   W3CreateCvar(cvarstr,str,cvardesc);
 }
-stock W3GetCvarFloat(cvarid) {
+stock Float:W3GetCvarFloat(cvarid) {
   decl String:ret[1024];
   W3GetCvar(cvarid, ret, sizeof(ret));
   return StringToFloat(ret);
@@ -892,17 +892,7 @@ forward OnW3DodgePost(victim, attacker);
 //Fired before a player dodges, you can edit the dodge chance here
 forward OnW3DodgePre(victim,attacker,Float:chance);
 
-//Fired every time a ward is created
-forward OnWardCreated(wardindex, behaviorID);
-
-//Fired every time a ward "pulses"
-forward OnWardPulse(wardindex, behaviorID);
-
-//Fired every time a ward "pulses" when a valid target is in range
-forward OnWardTrigger(wardindex, victim, owner, behaviorID);
-
-//Fired every time a ward is removed
-forward OnWardExpire(wardindex, owner, behaviorID);
+// Ward forwards (OnWardCreated, OnWardPulse, OnWardTrigger, OnWardExpire): see War3Source_Wards.inc
 
 /*
  * STOCKS STOCKS STOCKS STOCKS STOCKS STOCKS STOCKS STOCKS STOCKS STOCKS STOCKS STOCKS STOCKS STOCKS STOCKS STOCKS STOCKS STOCKS STOCKS STOCKS
@@ -1049,7 +1039,8 @@ stock HasSMAccess(client, flag) {
 /* is a normal engine cvar empty (zero length, "") ? */
 stock bool:CvarEmpty(Handle:sourcemod_convar) {
   static String:zzstr[32];
-  return (GetConVarString(sourcemod_convar, zzstr, sizeof(zzstr))&&strlen(zzstr)<1);
+  GetConVarString(sourcemod_convar, zzstr, sizeof(zzstr));
+  return strlen(zzstr)<1;
 
 }
 
@@ -1251,7 +1242,7 @@ stock W3SQLPlayerInt(Handle:query,const String:columnname[]) //fech from query
   return StringToInt(result);
 }
 //fetch using column string
-stock W3SQLPlayerFloat(Handle:query,const String:columnname[]) //fech from query
+stock Float:W3SQLPlayerFloat(Handle:query,const String:columnname[]) //fech from query
 {
   new column;
   SQL_FieldNameToNum(query,columnname,column);

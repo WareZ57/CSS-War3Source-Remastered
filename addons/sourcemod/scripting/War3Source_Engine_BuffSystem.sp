@@ -14,7 +14,7 @@ public Plugin:myinfo =
 //for debuff index, see constants, its in an enum
 new any:buffdebuff[MAXPLAYERSCUSTOM][W3Buff][MAXITEMS+MAXRACES+MAXITEMS2+CUSTOMMODIFIERS]; ///a race may only modify a property once
 
-new BuffProperties[W3Buff][W3BuffProperties];
+any BuffProperties[W3Buff][W3BuffProperties];
 
 new any:BuffCached[MAXPLAYERSCUSTOM][W3Buff];// instead of looping, we cache everything in the last dimension, see enum W3BuffCache
 
@@ -629,59 +629,6 @@ Float:MagicArmorMulti(client){
 
 
 
-stock GetEntityAlpha(index)
-{
-  return GetEntData(index,m_OffsetClrRender+3,1);
-}
-
-stock GetPlayerR(index)
-{
-  return GetEntData(index,m_OffsetClrRender,1);
-}
-
-stock GetPlayerG(index)
-{
-  return GetEntData(index,m_OffsetClrRender+1,1);
-}
-
-stock GetPlayerB(index)
-{
-  return GetEntData(index,m_OffsetClrRender+2,1);
-}
-
-stock SetPlayerRGB(index,r,g,b)
-{
-  SetEntityRenderMode(index,RENDER_TRANSCOLOR);
-  SetEntityRenderColor(index,r,g,b,GetEntityAlpha(index));  
-}
-
-// FX Distort == 14
-// Render TransAdd == 5
-stock SetEntityAlpha(index,alpha)
-{ 
-  //if(FindSendPropInfo(index,"m_nRenderFX")>-1&&FindSendPropInfo(index,"m_nRenderMode")>-1){
-  new String:class[32];
-  GetEntityNetClass(index, class, sizeof(class) );
-  //PrintToServer("%s",class);
-  if(FindSendPropInfo(class,"m_nRenderFX")>-1){
-    SetEntityRenderMode(index,RENDER_TRANSCOLOR);
-    SetEntityRenderColor(index,GetPlayerR(index),GetPlayerG(index),GetPlayerB(index),alpha);
-  }
-  //else{
-  //  W3Log("deny render fx %d",index);
-  //}
-  //} 
-}
-
-stock GetWeaponAlpha(client)
-{
-  new wep=W3GetCurrentWeaponEnt(client);
-  if(wep>MaxClients && IsValidEdict(wep))
-  {
-    return GetEntityAlpha(wep);
-  }
-  return 255;
-}
 
 
 //use 0 < limit

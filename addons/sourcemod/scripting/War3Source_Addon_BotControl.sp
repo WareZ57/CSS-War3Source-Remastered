@@ -274,7 +274,7 @@ public DistributeSkillPoints(client)
         /* TODO: PUT INTO CVAR */
         new max_attempts = 50;
         new attempts = 0;
-        while skillpoints > 0 && attempts <= max_attempts do
+        while (skillpoints > 0 && attempts <= max_attempts)
         {
             //PrintToServer("Applying skill points to bot (Attempt %i)", attempts);
             

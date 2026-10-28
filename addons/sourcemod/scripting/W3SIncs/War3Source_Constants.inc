@@ -210,33 +210,33 @@ enum ValveGameEnum
 //Basically Instance variables for the Player Class
 enum W3PlayerProp
 {
-  bool:bPutInServer,
+  bPutInServer,
   CurrentRace,
   PendingRace,
   PlayerGold,
   iMaxHP,
   bIsDucking,
   
-  bool:xpLoaded,
-  Float:RaceChosenTime,
-  bool:RaceSetByAdmin,
-  bool:SpawnedOnce, //if player has spawned once
-  Float:sqlStartLoadXPTime,
+  xpLoaded,
+  RaceChosenTime,
+  RaceSetByAdmin,
+  SpawnedOnce, //if player has spawned once
+  sqlStartLoadXPTime,
   
-  bool:isDeveloper,
-  Float:LastChangeTeamTime,
-  bool:bStatefulSpawn, //set true if spawn is a non repeated spawn. set to true on join and death, set false after spawn forward is finished.
+  isDeveloper,
+  LastChangeTeamTime,
+  bStatefulSpawn, //set true if spawn is a non repeated spawn. set to true on join and death, set false after spawn forward is finished.
   
   PlayerDiamonds,//PlayerDiamonds
 }
 enum W3SkillProp
 {
-  bool:ActivateOnEnemy,
+  ActivateOnEnemy,
   
   ///TO BE IMPLEMENTED
   MaxLevel,
-  bool:IsUltimate,
-  SkillName[32],
+  IsUltimate,
+  SkillPropName,
 }
 //EXCLUSIVE: buffs that do not stack with itself: gravity, invisblity, however to make them stack use a second property ie gravity2, invisibilty2
 //////////////////Generally races use "buffvar" and items that wish to stack uses "varbuff2" and the final value is calculated: best of "buffvar" stacked with best of "buffvar2"
@@ -248,8 +248,8 @@ enum W3SkillProp
 
 enum W3BuffProperties
 {
-  any:DefaultValue=0, //array index 1
-  BuffStackCacheType:BuffStackType=1, //array index 1
+  DefaultValue=0, //array index 1
+  BuffStackType=1, //array index 1
 }
 
 enum BuffStackCacheType
@@ -362,7 +362,7 @@ stock MaxBuffLoopLimit=_:MaxBuffLoopLimitTemp;
 
 //create an buffpropertiesarray[W3Buff][W3BuffProperties]; (separate from the array that stores every client's buffs)
 //we fill the array with its properties
-stock InitiateBuffPropertiesArray(buffpropertiesarray[W3Buff][W3BuffProperties])
+stock InitiateBuffPropertiesArray(any buffpropertiesarray[W3Buff][W3BuffProperties])
 {
   
   for(new i=0;i<MaxBuffLoopLimit;i++)

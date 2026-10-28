@@ -21,5 +21,5 @@ public bool:InitNativesForwards()
 }
 
 stock SetCollidable(client, bool:collidable){
-    SetEntData(entity, g_offsCollisionGroup, collidable ? 5 : 2, 4, true);
+    SetEntData(client, g_offsCollisionGroup, collidable ? 5 : 2, 4, true);
 }

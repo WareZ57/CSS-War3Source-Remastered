@@ -141,8 +141,21 @@ public War3_raceinfoSelected(Handle:menu,MenuAction:action,client,selection)
   }
 }
 
+// Race statistics came from the War3Source stats server (optional/online-stats, not installed by default)
+public bool:InitNativesForwards()
+{
+    MarkNativeAsOptional("W3GetStatsKDRTrie");
+    return true;
+}
+
 bool:GetRaceStat(raceid,bool:game=false,String:type[]="kdr",&Float:floatresult){
+    if(GetFeatureStatus(FeatureType_Native, "W3GetStatsKDRTrie") != FeatureStatus_Available){
+        return false;
+    }
     new Handle:trie=W3GetStatsKDRTrie();
+    if(trie==INVALID_HANDLE){
+        return false;
+    }
     
     //new String:result;
     new String:prepend[116];
@@ -676,6 +689,7 @@ War3_playertargetItemMenu(client,target) {
 
 
 public War3_playertargetItemMenuSelected2(Handle:menu,MenuAction:action,client,selection)
+{
   if(action==MenuAction_Select)
   {
     decl String:SelectionInfo[4];
@@ -692,10 +706,11 @@ public War3_playertargetItemMenuSelected2(Handle:menu,MenuAction:action,client,s
         War3_playertargetItemMenu(client,target);
       }
     }
-    if(action==MenuAction_End)
-    {
-      CloseHandle(menu);
-    }
+  }
+  else if(action==MenuAction_End)
+  {
+    CloseHandle(menu);
+  }
 }
 
 public War3_playertargetMenuSelected(Handle:menu,MenuAction:action,client,selection)

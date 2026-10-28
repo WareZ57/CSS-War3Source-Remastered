@@ -58,8 +58,8 @@ public NW3Deny(Handle:plugin,numParams){
 }
 
 public NW3GetVar(Handle:plugin,numParams){
-    return _:W3VarArr[War3Var:GetNativeCell(1)];
+    return _:W3VarArr[W3Var:GetNativeCell(1)];
 }
 public NW3SetVar(Handle:plugin,numParams){
-    W3VarArr[War3Var:GetNativeCell(1)]=GetNativeCell(2);
+    W3VarArr[W3Var:GetNativeCell(1)]=GetNativeCell(2);
 }

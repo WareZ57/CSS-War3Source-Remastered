@@ -17,7 +17,7 @@ public bool:InitNativesForwards()
     /* PrepSDKCall_SetAddress is only available in 1.6 and above. */
     MarkNativeAsOptional("PrepSDKCall_SetAddress");
     
-    CreateNative("War3_IsMeleeWeapon", NativeCall:Native_War3_IsMeleeWeapon);
+    CreateNative("War3_IsMeleeWeapon", Native_War3_IsMeleeWeapon);
     return true;
 }
 
@@ -30,9 +30,9 @@ Handle:FindIsMeleeWeapon(Handle:hGameConf)
         if(funcAddr != Address_Null)
         {
             /* Get call offset. */
-            new callOffset = LoadFromAddress(Address:(any:funcAddr + 1), NumberType_Int32);
+            new callOffset = LoadFromAddress(funcAddr + view_as<Address>(1), NumberType_Int32);
             /* We need to use the value of EIP to calculate the VA of the function. */
-            funcAddr = Address:((any:funcAddr + 5) + callOffset);
+            funcAddr = funcAddr + view_as<Address>(5 + callOffset);
             /* Tell SDKTools to prepare the function call to the specified address. */
             StartPrepSDKCall(SDKCall_Entity);
             PrepSDKCall_SetAddress(funcAddr);
@@ -81,7 +81,7 @@ public OnPluginStart()
     }
 }
 
-public bool:Native_War3_IsMeleeWeapon(Handle:plugin, numParams)
+public Native_War3_IsMeleeWeapon(Handle:plugin, numParams)
 {
     new ent = GetNativeCell(1);
     if(IsValidEntity(ent))

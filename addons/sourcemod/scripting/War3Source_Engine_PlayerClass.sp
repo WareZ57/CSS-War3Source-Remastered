@@ -12,7 +12,7 @@ new p_xp[MAXPLAYERSCUSTOM][MAXRACES];
 new p_level[MAXPLAYERSCUSTOM][MAXRACES];
 new p_skilllevel[MAXPLAYERSCUSTOM][MAXRACES][MAXSKILLCOUNT];
 
-new p_properties[MAXPLAYERSCUSTOM][W3PlayerProp];
+any p_properties[MAXPLAYERSCUSTOM][W3PlayerProp];
 
 
 new bool:bResetSkillsOnSpawn[MAXPLAYERSCUSTOM];

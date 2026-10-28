@@ -151,9 +151,8 @@ stock Float:TF2_GetUberLevel(client)
             return 0.0;
         }
     }
-    else {
-        return fUberCharge[client];
-    }
+    // Only medics have an uber charge
+    return 0.0;
 }
 
 stock TF2_SetUberLevel(client, Float:uberlevel)
@@ -166,9 +165,7 @@ stock TF2_SetUberLevel(client, Float:uberlevel)
             SetEntPropFloat(index, Prop_Send, "m_flChargeLevel", uberlevel);
         }
     }
-    else {
-        fUberCharge[client] = uberlevel;
-    }
+
 }
 
 //Sends a particle to client like "miss_text"

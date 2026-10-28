@@ -695,7 +695,7 @@ stock Float:L4D_GetAvgSurvivorIntensity()
     for (new i = 1; i <= MaxClients; i++)
     {
         if (!IsClientInGame(i) ||
-            L4DTeam:GetClientTeam(i) != L4DTeam_Survivor ||
+            GetClientTeam(i) != 2 || // 2 = survivors
             !IsPlayerAlive(i) ||
             GetClientHealth(i) < 1)
         {
@@ -723,7 +723,7 @@ stock Float:L4D_GetAvgSurvivorIntensity()
  */
 stock L4D_SetPlayerIntensity(client, Float:intensity)
 {
-    SetEntProp(client, Prop_Send, "m_clientIntensity", RoundToNearest(intensity * 100.0);
+    SetEntProp(client, Prop_Send, "m_clientIntensity", RoundToNearest(intensity * 100.0));
 }
 
 /**

@@ -104,7 +104,7 @@ ApplyTimedBuffOrDebuff(W3BuffType:buffType)
     new iAttributeId = GetNativeCell(2);
     new any:value = GetNativeCell(3);
     new Float:fDuration = GetNativeCell(4);
-    new W3BuffSourceType:sourceType = GetNativeCell(5);
+    new W3BuffSource:sourceType = GetNativeCell(5);
     new source = GetNativeCell(6);
     new expireFlag = GetNativeCell(7);
     new bool:bCanStack = GetNativeCell(9);
@@ -119,7 +119,7 @@ ApplyTimedBuffOrDebuff(W3BuffType:buffType)
             if (buffedclient == client)
             {
                 new buffedSource = GetArrayCell(g_hBuffSource, i);
-                new W3BuffSourceType:buffedSourceType = GetArrayCell(g_hBuffSourceType, i);
+                new W3BuffSource:buffedSourceType = GetArrayCell(g_hBuffSourceType, i);
                 new bool:bBuffedCanStack = GetArrayCell(g_hBuffCanStack, i);
                 
                 if ((buffedSource != source) || (buffedSourceType != sourceType) || !bBuffedCanStack)
@@ -161,7 +161,7 @@ ApplyRaceBuffOrDebuff(W3BuffType:buffType)
     new iAttributeId = GetNativeCell(2);
     new any:value = GetNativeCell(3);
     new raceID = GetNativeCell(4);
-    new W3BuffSourceType:sourceType = GetNativeCell(5);
+    new W3BuffSource:sourceType = GetNativeCell(5);
     new source = GetNativeCell(6);
     
     // Buffs in general
