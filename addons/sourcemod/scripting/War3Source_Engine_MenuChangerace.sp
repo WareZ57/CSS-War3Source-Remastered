@@ -185,11 +185,12 @@ stock GetNewRacesInCat(client,String:category[]) {
     new amount=0;
     new racelist[MAXRACES];
     new racedisplay=W3GetRaceList(racelist);
-    for(new i=1;i<racedisplay;i++)
+    for(new i=0;i<racedisplay;i++)
     {
+        new raceid=racelist[i];
         new String:rcvar[64];
-        W3GetCvar(W3GetRaceCell(i,RaceCategorieCvar),rcvar,sizeof(rcvar));
-        if(strcmp(category, rcvar, false)==0) {
+        W3GetCvar(W3GetRaceCell(raceid,RaceCategorieCvar),rcvar,sizeof(rcvar));
+        if(strcmp(category, rcvar, false)==0 && War3_GetLevel(client,raceid)==0) {
             amount++;
         }
     }
@@ -232,11 +233,14 @@ War3Source_ChangeRaceMenu(client,bool:forceUncategorized=false)
                 if(strlen(strCat)>0) {
                     if(HasCategoryAccess(client,i)) {
                         new amount=GetNewRacesInCat(client,strCat);
+                        decl String:buffer[64];
                         if(amount>0) {
-                            decl String:buffer[64];
                             Format(buffer,sizeof(buffer),"%s (%i new races)",strCat,amount);
                         }
-                        AddMenuItem(crMenu,strCat,strCat);
+                        else {
+                            strcopy(buffer,sizeof(buffer),strCat);
+                        }
+                        AddMenuItem(crMenu,strCat,buffer);
                     }
                 }
             }

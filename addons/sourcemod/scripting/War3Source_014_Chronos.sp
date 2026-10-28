@@ -66,7 +66,6 @@ new BeamSprite;
 new HaloSprite;
 
 
-stock oldbuttons[MAXPLAYERSCUSTOM];
 new bool:lastframewasground[MAXPLAYERSCUSTOM];
 
 public OnPluginStart()
@@ -91,7 +90,7 @@ public OnMapStart()
 
     War3_AddCustomSound(leapsnd);
     War3_AddCustomSound(spheresnd);
-    glowsprite=PrecacheModel("sprites/strider_blackball.spr");
+    glowsprite=PrecacheModel("materials/sprites/strider_blackball.vmt");
     
     BeamSprite=War3_PrecacheBeamSprite();
     HaloSprite=War3_PrecacheHaloSprite();

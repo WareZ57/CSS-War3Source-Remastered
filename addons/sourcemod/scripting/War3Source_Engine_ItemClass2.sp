@@ -98,7 +98,7 @@ public Action:Timer_Diamonds(Handle:timer, any:userid)
 {
 	if(Shop2Enabled())
 	{
-		for(new i=1; i<GetMaxClients(); i++)
+		for(new i=1; i<=MaxClients; i++)
 		{
 			if(ValidPlayer(i))
 			{

@@ -207,7 +207,7 @@ public Action:DeciSecondTimer(Handle:timer)
                 new Float:falpha=1.0;
                 if(!W3GetBuffHasTrue(client,bInvisibilityDenySkill))
                 {
-                    falpha=FloatMul(falpha,W3GetBuffMinFloat(client,fInvisibilitySkill));
+                    falpha=(falpha)*(W3GetBuffMinFloat(client,fInvisibilitySkill));
                     
                 }
                 //if(!W3GetBuffHasTrue(client,bInvisibilityDenySkillbInvisibl  ///we dont have an item deny yet
@@ -217,11 +217,11 @@ public Action:DeciSecondTimer(Handle:timer)
                     //has skill, reduce stack
                     itemalpha=Pow(itemalpha,0.75);
                 }
-                falpha=FloatMul(falpha,itemalpha);
+                falpha=(falpha)*(itemalpha);
                 
                 //PrintToChatAll("%f",W3GetBuffMinFloat(client,fInvisibilityItem));
                 
-                new alpha2=RoundFloat(       FloatMul(255.0,falpha)  ); 
+                new alpha2=RoundFloat(       (255.0)*(falpha)  ); 
                 //PrintToChatAll("alpha2 = %d",alpha2);
                 if(alpha2>=0&&alpha2<=255){
                     alpha=alpha2;
@@ -370,12 +370,12 @@ public OnGameFrame()
                                 speedmulti=0.0;
                             }
                             if(!W3GetBuffHasTrue(client,bSlowImmunity)){
-                                speedmulti=FloatMul(speedmulti,W3GetBuffStackedFloat(client,fSlow)); 
-                                speedmulti=FloatMul(speedmulti,W3GetBuffStackedFloat(client,fSlow2)); 
+                                speedmulti=(speedmulti)*(W3GetBuffStackedFloat(client,fSlow)); 
+                                speedmulti=(speedmulti)*(W3GetBuffStackedFloat(client,fSlow2)); 
                             }
                             //PrintToConsole(client,"speedmulti should be 1.0 %f %f",speedmulti,speedadd);
                             gspeedmulti[client]=speedmulti;
-                            new Float:newmaxspeed=FloatMul(speedBefore[client],speedmulti);
+                            new Float:newmaxspeed=(speedBefore[client])*(speedmulti);
                             if(newmaxspeed<0.1){
                                 newmaxspeed=0.1;
                             }
@@ -397,8 +397,8 @@ public OnGameFrame()
                             speedmulti=0.0;
                         }
                         if(!W3GetBuffHasTrue(client,bSlowImmunity)){
-                            speedmulti=FloatMul(speedmulti,W3GetBuffStackedFloat(client,fSlow)); 
-                            speedmulti=FloatMul(speedmulti,W3GetBuffStackedFloat(client,fSlow2)); 
+                            speedmulti=(speedmulti)*(W3GetBuffStackedFloat(client,fSlow)); 
+                            speedmulti=(speedmulti)*(W3GetBuffStackedFloat(client,fSlow2)); 
                         }
                         
                         if(GetEntDataFloat(client,m_OffsetSpeed)!=speedmulti){

@@ -124,7 +124,7 @@ public OnMapStart()
     BeamSprite=War3_PrecacheBeamSprite();
     HaloSprite=War3_PrecacheHaloSprite();
     if(GAMECSANY){
-        KnifeModel=PrecacheModel("models/weapons/w_knife.vmt");
+        KnifeModel=PrecacheModel(GAMECSGO ? "models/weapons/w_knife.vmt" : "materials/models/weapons/w_models/w_knife_t/w_knife_t.vmt");
         if(GAMECSGO) {
             // Theese models aren't always precached
             PrecacheModel("models/player/ctm_gsg9.mdl");

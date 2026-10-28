@@ -6,7 +6,9 @@
  *                                                                        *
  **************************************************************************/
 
+#if !defined MAX_MESSAGE_LENGTH
 #define MAX_MESSAGE_LENGTH 250
+#endif
 #define MAX_COLORS 6
 
 #define SERVER_INDEX 0

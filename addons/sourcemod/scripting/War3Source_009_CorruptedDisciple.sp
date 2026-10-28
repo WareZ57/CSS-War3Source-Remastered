@@ -508,7 +508,7 @@ public PlayerHurtEvent(Handle:event,const String:name[],bool:dontBroadcast)
                     new Float:otherVec[3];
                     for(new i=1;i<=MaxClients;i++)
                     {
-                        if(ValidPlayer(i,true)&&GetClientTeam(i)!=team)
+                        if(ValidPlayer(i,true)&&GetClientTeam(i)==team) // you and your teammates (was healing enemies)
                         {
                             GetClientAbsOrigin(i,otherVec);
                             if(GetVectorDistance(pos,otherVec)<StaticHealRadius){

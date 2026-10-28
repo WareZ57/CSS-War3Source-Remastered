@@ -14,8 +14,6 @@ new String:explosionSound1[256];
 
 
 #define MAXWARDS 64*4 //on map LOL
-#define WARDBELOW -2.0 // player is 60 units tall about (6 feet)
-#define WARDABOVE 160.0
 
 new BeamSprite;
 new HaloSprite;

@@ -166,6 +166,19 @@ DisableRace(oldrace)
         Call_StartForward(g_OnWar3RaceDisabled);
         Call_PushCell(oldrace);
         Call_Finish(dummy);
+        
+        // A disabled race ignores its own timers, including the ones that remove what it did to other
+        // players (stun, bash, slow...): remove every buff it still holds, or they would last forever
+        if(oldrace>0)
+        {
+            for(new i=1;i<=MaxClients;i++)
+            {
+                if(IsClientInGame(i))
+                {
+                    W3ResetAllBuffRace(i,oldrace);
+                }
+            }
+        }
     }
 }
 
@@ -330,10 +343,7 @@ public NWar3_SetRace(Handle:plugin,numParams){
                 decl String:buf[64];
                 War3_GetRaceName(newrace,buf,sizeof(buf));
                 War3_ChatMessage(client,"%T","You are now {racename}",client,buf);
-                
-                if(oldrace==0){
-                    War3_ChatMessage(client,"%T","say war3bug <description> to file a bug report",client);
-                }
+
                 W3CreateEvent(DoCheckRestrictedItems,client);
             }
         }

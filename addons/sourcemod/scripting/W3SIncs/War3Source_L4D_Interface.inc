@@ -268,7 +268,7 @@ stock GetCurrentBackupAmmo(client)
     new iWeapon = GetPlayerWeaponSlot(client, 0);
     GetEdictClassname(iWeapon, weapon, sizeof(weapon));
     
-    new iAmmoOffset = FindDataMapOffs(client, "m_iAmmo");
+    new iAmmoOffset = FindDataMapInfo(client, "m_iAmmo");
     new backup_ammo = 0;
 
     if (StrEqual(weapon, "weapon_rifle", false) || StrEqual(weapon, "weapon_rifle_ak47", false) || StrEqual(weapon, "weapon_rifle_desert", false) || StrEqual(weapon, "weapon_rifle_sg552", false))
@@ -350,7 +350,7 @@ stock SetBackupAmmo(client, ammo)
     new iWeapon = GetPlayerWeaponSlot(client, 0);
     GetEdictClassname(iWeapon, weapon, sizeof(weapon));
     
-    new iAmmoOffset = FindDataMapOffs(client, "m_iAmmo");
+    new iAmmoOffset = FindDataMapInfo(client, "m_iAmmo");
 
     if (StrEqual(weapon, "weapon_rifle", false) || StrEqual(weapon, "weapon_rifle_ak47", false) || StrEqual(weapon, "weapon_rifle_desert", false) || StrEqual(weapon, "weapon_rifle_sg552", false))
     {

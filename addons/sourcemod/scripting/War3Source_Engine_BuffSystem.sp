@@ -415,7 +415,7 @@ stock Float:CalcBuffStackedFloat(client,W3Buff:buffindex)
     new loop = ItemsPlusRacesLoaded();
     for(new i=1;i<=loop;i++)
     {
-      value=FloatMul(value,buffdebuff[client][buffindex][i]);
+      value=value*view_as<float>(buffdebuff[client][buffindex][i]);
     }
     return value;
   }

@@ -916,7 +916,9 @@ forward OnW3DodgePre(victim,attacker,Float:chance);
  * STOCKS STOCKS STOCKS STOCKS STOCKS STOCKS STOCKS STOCKS STOCKS STOCKS STOCKS STOCKS STOCKS STOCKS STOCKS STOCKS STOCKS STOCKS STOCKS STOCKS
  */
 
+#if !defined MAX_MESSAGE_LENGTH
 #define MAX_MESSAGE_LENGTH 250
+#endif
 
 /** 
  * Prints a message in the chat area with [War3Source] pre-appended.
@@ -1527,6 +1529,7 @@ stock W3MsgVoodooEnded(client) {
   PrintHintText(client, "%T", "Voodoo has ended", client);
 }
 stock W3MsgEnemyHasImmunity(client,bool:console=true) {
+  #pragma unused console
   PrintHintText(client,"%T","Enemy has immunity!",client);
   PrintToConsole(client,"%T","[W3S] Enemy has immunity!",client);
 }
@@ -1712,7 +1715,12 @@ stock Float:AbsoluteTime() {
   return GetEngineTime();
 }
 
-stock CreateTimer_DEBUG(any:f=0,any:ff=0,any:fff=0,any:ffff=0) {}
+stock CreateTimer_DEBUG(any:f=0,any:ff=0,any:fff=0,any:ffff=0) {
+  #pragma unused f
+  #pragma unused ff
+  #pragma unused fff
+  #pragma unused ffff
+}
 
 
 // PUT THIS WHERE IT MAKES SENSE SOMETIME

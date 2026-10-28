@@ -20,7 +20,7 @@ new Handle:g_hXPMultipler = INVALID_HANDLE;
 new Handle:g_hVarWelcomeMsg = INVALID_HANDLE;
 
 new bool:g_bSteamWorks = false;
-new bool:bIsInGroup[MAXPLAYERSCUSTOM] = false;
+new bool:bIsInGroup[MAXPLAYERSCUSTOM];
 
 public OnPluginStart()
 {
@@ -104,8 +104,8 @@ public OnWar3Event(W3EVENT:event,client)
         }
         if( bAwardBonus ) {
             // Award dat bonus
-            W3SetVar(EventArg2,RoundToCeil(FloatMul(float(W3GetVar(EventArg2)),GetConVarFloat(g_hXPMultipler))));
-            W3SetVar(EventArg3,RoundToCeil(FloatMul(float(W3GetVar(EventArg3)),GetConVarFloat(g_hGOMultipler))));
+            W3SetVar(EventArg2,RoundToCeil((float(W3GetVar(EventArg2)))*(GetConVarFloat(g_hXPMultipler))));
+            W3SetVar(EventArg3,RoundToCeil((float(W3GetVar(EventArg3)))*(GetConVarFloat(g_hGOMultipler))));
         }
     }
 }

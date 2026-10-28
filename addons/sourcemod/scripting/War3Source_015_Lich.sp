@@ -322,7 +322,7 @@ public OnUltimateCommand(client,race,bool:pressed)
                                 PrintHintText(victim,"%T","Attacked by Death and Decay",victim);
                             }
                         }
-                        PrintHintText(client,"%T","Death and Decay attacked for {amount} total damage!",client,damage*targetsfound);
+                        PrintHintText(client,"%T","Death and Decay attacked for {amount} total damage!",client,damagedealt);
                         War3_CooldownMGR(client,GetConVarFloat(ultCooldownCvar),thisRaceID,ULT_DEATHDECAY,_,_);
                         EmitSoundToAllAny(ultsnd,client);
                     }

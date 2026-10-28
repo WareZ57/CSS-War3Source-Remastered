@@ -46,14 +46,15 @@ public OnPluginStart()
 public OnMapStart()
 {
     War3_AddSoundFolder(beamsnd, sizeof(beamsnd), "moonqueen/beam.mp3");
+    War3_AddCustomSound( beamsnd );
     if(GameCS()) {
-        War3_AddSoundFolder(lunasnd2, sizeof(lunasnd2), "flashbang_explode2.mp3");
+        // Stock CS:S sound (war3source/flashbang_explode2.mp3 never existed)
+        strcopy(lunasnd2, sizeof(lunasnd2), "weapons/flashbang/flashbang_explode2.wav");
+        PrecacheSoundAny(lunasnd2);
     } else {
         War3_AddSoundFolder(lunasnd2, sizeof(lunasnd2), "moonqueen/flashbang_explode1.mp3");
+        War3_AddCustomSound( lunasnd2 );
     }
-    
-    War3_AddCustomSound( beamsnd );
-    War3_AddCustomSound( lunasnd2 );
     
     //BeamSprite=War3_PrecacheBeamSprite();
     HaloSprite=War3_PrecacheHaloSprite();

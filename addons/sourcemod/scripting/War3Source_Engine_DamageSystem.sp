@@ -261,11 +261,11 @@ public Action:SDK_Forwarded_OnTakeDamage(victim,&attacker,&inflictor,&Float:dama
         damagestack++;
         
         if(g_CurDamageIsWarcraft && !War3_IsCommonInfected(victim) && !War3_IsWitch(victim)){
-            damage=FloatMul(damage,W3GetMagicArmorMulti(victim));
+            damage=(damage)*(W3GetMagicArmorMulti(victim));
             //PrintToChatAll("magic %f %d to %d",W3GetMagicArmorMulti(victim),attacker,victim);
         }
         else if(!g_CurDamageIsTrueDamage && !War3_IsCommonInfected(victim) && !War3_IsWitch(victim)){ //bullet 
-            damage=FloatMul(damage,W3GetPhysicalArmorMulti(victim));
+            damage=(damage)*(W3GetPhysicalArmorMulti(victim));
             
             //PrintToChatAll("physical %f %d to %d",W3GetPhysicalArmorMulti(victim),attacker,victim);
             //g_CurDamageIsWarcraft=false;

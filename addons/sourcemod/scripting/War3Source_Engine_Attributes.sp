@@ -16,7 +16,7 @@ new Handle:g_hAttributeShortname = INVALID_HANDLE;
 new Handle:g_hAttributeDefault = INVALID_HANDLE;
 
 // Stores the attributes of a player
-new Handle:g_hAttributeValue[MAXPLAYERS] = INVALID_HANDLE;
+new Handle:g_hAttributeValue[MAXPLAYERS];
 
 // Forward handles
 new Handle:g_War3_OnAttributeChanged = INVALID_HANDLE;
@@ -204,13 +204,13 @@ GetAttributeName(attributeId, String:sName[], iBufferSize)
 GetAttributeShortname(attributeId, String:sShortname[], iBufferSize)
 {
     
-    if(GetArraySize(g_hAttributeShortname) < attributeId)
+    if(GetArraySize(g_hAttributeShortname) <= attributeId)
     {
         strcopy(sShortname, iBufferSize, "invalid");
     }
     else
     {
-        GetArrayString(g_hAttributeShortname, attributeId, sShortname, sizeof(iBufferSize));
+        GetArrayString(g_hAttributeShortname, attributeId, sShortname, iBufferSize);
     }
 }
 

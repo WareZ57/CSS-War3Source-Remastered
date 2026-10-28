@@ -149,7 +149,7 @@ public OnWar3EventDeath(victim, attacker)
             new skill = War3_GetSkillLevel(attacker, thisRaceID, SKILL_FEAST);
             if(skill > 0 && !Hexed(attacker, false))
             {
-                War3_HealToMaxHP(attacker, RoundFloat(FloatMul(float(War3_GetMaxHP(victim)), FeastAmount[skill])));
+                War3_HealToMaxHP(attacker, RoundFloat((float(War3_GetMaxHP(victim)))*(FeastAmount[skill])));
                 W3FlashScreen(attacker, RGBA_COLOR_GREEN, 0.3, _, FFADE_IN);
             }
         }
@@ -185,7 +185,7 @@ public Action:RuptureCheckLoop(Handle:h, any:data)
             GetClientAbsOrigin(i,origin);
             dist=GetVectorDistance(origin, lastRuptureLocation[i]);
             
-            new damage = RoundFloat(FloatMul(dist, War3_GetGame() == CS ? ultiDamageMultiPerDistanceCS[skilllevel] : ultiDamageMultiPerDistance[skilllevel]));
+            new damage = RoundFloat((dist)*(War3_GetGame() == CS ? ultiDamageMultiPerDistanceCS[skilllevel] : ultiDamageMultiPerDistance[skilllevel]));
             if(damage > 0)
             {
                 if(War3_GetGame() == Game_TF)
@@ -281,7 +281,7 @@ public OnW3EnemyTakeDmgBulletPre(victim,attacker,Float:damage)
         skilllevel = War3_GetSkillLevel(attacker, thisRaceID, SKILL_SENSE);
         if(skilllevel > 0)
         {
-            if(FloatDiv(float(GetClientHealth(victim)), float(War3_GetMaxHP(victim))) < BloodSense[skilllevel])
+            if((float(GetClientHealth(victim)))/(float(War3_GetMaxHP(victim))) < BloodSense[skilllevel])
             {
                 W3FlashScreen(victim, RGBA_COLOR_RED, 0.3,_, FFADE_IN);
                 War3_DamageModPercent(2.0);
