@@ -46,12 +46,22 @@ ConnectDB()
     {
         hDB = SQL_Connect(sDBConnect, true, sError, sizeof(sError));
     }
+    if(!hDB && !StrEqual(sDBConnect, "storage-local", false))
+    {
+        // Out of the box, SourceMod's "default" database is MySQL on localhost, which most servers don't have:
+        // fall back to SourceMod's local SQLite database so that XP is saved anyway
+        // Expected on a fresh install: a normal log message, not an error
+        LogMessage("Could not connect to database \"%s\" (%s), using SourceMod's local SQLite database (\"storage-local\") instead. Set \"database\" in configs/war3source.ini to choose another one.", sDBConnect, sError);
+        PrintToServer("[War3Source] Database \"%s\" unavailable, using SourceMod's local SQLite database (\"storage-local\")", sDBConnect);
+        strcopy(sDBConnect, sizeof(sDBConnect), "storage-local");
+        hDB = SQL_Connect(sDBConnect, true, sError, sizeof(sError));
+    }
     if(!hDB)
     {
-        War3_LogError("[War3Source] ERROR: hDB invalid handle, Check SourceMod database config, could not connect.");
+        War3_LogCritical("[War3Source] ERROR: hDB invalid handle, Check SourceMod database config, could not connect.");
         Format(dbErrorMsg, sizeof(dbErrorMsg), "ERR: Could not connect to DB. \n%s", sError);
         
-        War3_LogError("ERRMSG: (%s)", sError);
+        War3_LogCritical("ERRMSG: (%s)", sError);
         CreateWar3GlobalError("ERR: Could not connect to Database");
     }
     else
@@ -70,11 +80,13 @@ ConnectDB()
         {
             g_SQLType = SQLType_Unknown;
         }
-        PrintToServer("[War3Source] SQL connection successful, driver %s", sDBMS);
+        PrintToServer("[War3Source] SQL connection successful (%s), driver %s", sDBConnect, sDBMS);
 
-        SQL_LockDatabase(hDB);
-        SQL_FastQuery(hDB, "SET NAMES \"UTF8\""); 
-        SQL_UnlockDatabase(hDB);
+        if(g_SQLType == SQLType_MySQL)
+        {
+            // utf8mb4: player names may contain any character
+            SQL_SetCharset(hDB, "utf8mb4");
+        }
         
         W3SetVar(hDatabase, hDB);
         W3SetVar(hDatabaseType, g_SQLType);

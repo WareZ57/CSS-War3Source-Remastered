@@ -18,6 +18,9 @@ public void OnPluginStart()
     RegServerCmd("w3t_races", Cmd_Races, "Loaded races and their skills");
     RegServerCmd("w3t_matrix", Cmd_Matrix, "Tests every race with two frozen bots");
     RegServerCmd("w3t_items", Cmd_Matrix, "Tests every shop item with two frozen bots");
+    RegServerCmd("w3t_cmds", Cmd_Cmds, "Runs every War3Source chat command as a bot");
+    RegServerCmd("w3t_kill", Cmd_Kill, "The T bot kills the CT bot: XP, gold and level up");
+    RegServerCmd("w3t_set", Cmd_Set, "w3t_set <client> <race> <level> <xp> <gold>: sets a player's War3Source data");
 }
 
 public bool InitNativesForwards()
@@ -336,4 +339,153 @@ public Action Timer_Release(Handle timer, bool ult)
     if (IsClientInGame(g_T))
         FakeClientCommand(g_T, ult ? "-ultimate" : "-ability");
     return Plugin_Stop;
+}
+
+/* ------------------------------------------------------------------------------------------------
+ * w3t_cmds : every War3Source chat command, typed by a bot (menus are not shown to bots, but all the
+ * code behind them runs); prints the number of new lines in the SourceMod error log
+ * ---------------------------------------------------------------------------------------------- */
+static const char g_Cmds[][] = {
+    "war3menu", "showxp", "xp", "changerace", "cr", "raceinfo", "playerinfo", "myinfo", "skillsinfo", "showskills",
+    "spendskills", "resetskills", "shopmenu", "shopmenu2", "itemsinfo", "itemsinfo2", "iteminfo", "myitems", "buyprevious",
+    "levelbank", "war3top", "war3top10", "war3rank", "war3stats", "war3help", "wchelp", "war3version", "maxhp", "speed",
+    "help", "cvarlist", "tome", "w3s", "wcs"
+};
+
+int g_CmdBot, g_CmdStep, g_CmdErrBefore;
+
+public Action Cmd_Cmds(int args)
+{
+    g_CmdBot = 0;
+    for (int i = 1; i <= MaxClients && !g_CmdBot; i++)
+        if (IsClientInGame(i) && IsFakeClient(i) && !IsClientSourceTV(i))
+            g_CmdBot = i;
+    if (!g_CmdBot)
+    {
+        PrintToServer("w3t_cmds: needs a bot");
+        return Plugin_Handled;
+    }
+    g_CmdErrBefore = ErrorLogLines();
+    g_CmdStep = 0;
+    // one command every 0.25 s: the engine kicks a client that sends too many commands at once
+    CreateTimer(0.25, Timer_Cmds, _, TIMER_REPEAT);
+    return Plugin_Handled;
+}
+
+// Each command: "say cmd", "say !cmd", then menuselect 1..9 to browse the menu it opened
+#define CMD_SUBSTEPS 11
+
+public Action Timer_Cmds(Handle timer)
+{
+    if (!IsClientInGame(g_CmdBot))
+    {
+        PrintToServer("w3t_cmds: the bot left, stopped at step %d", g_CmdStep);
+        return Plugin_Stop;
+    }
+    int c = g_CmdStep / CMD_SUBSTEPS, sub = g_CmdStep % CMD_SUBSTEPS;
+    if (c >= sizeof(g_Cmds))
+    {
+        PrintToServer("w3t_cmds: %d commands (with and without !, then menus browsed), error log: %d new line(s)", sizeof(g_Cmds), ErrorLogLines() - g_CmdErrBefore);
+        return Plugin_Stop;
+    }
+    char cmd[64];
+    if (sub == 0)
+        Format(cmd, sizeof(cmd), "say %s", g_Cmds[c]);
+    else if (sub == 1)
+        Format(cmd, sizeof(cmd), "say !%s", g_Cmds[c]);
+    else
+        Format(cmd, sizeof(cmd), "menuselect %d", sub - 1);
+    FakeClientCommand(g_CmdBot, cmd);
+    g_CmdStep++;
+    return Plugin_Continue;
+}
+
+/* ------------------------------------------------------------------------------------------------
+ * w3t_kill [race] [times] : the T bot (level 0 of the race) kills the CT bot, XP/gold/level after each kill
+ * ---------------------------------------------------------------------------------------------- */
+int g_KillsLeft;
+
+public Action Cmd_Kill(int args)
+{
+    Cmd_Matrix_FindBots();
+    if (!g_T || !g_CT)
+    {
+        PrintToServer("w3t_kill: needs one T bot and one CT bot");
+        return Plugin_Handled;
+    }
+    char arg[16];
+    int race = 1;
+    g_KillsLeft = 5;
+    if (args >= 1) { GetCmdArg(1, arg, sizeof(arg)); race = StringToInt(arg); }
+    if (args >= 2) { GetCmdArg(2, arg, sizeof(arg)); g_KillsLeft = StringToInt(arg); }
+    War3_SetRace(g_T, race);
+    War3_SetLevel(g_T, race, 0);
+    War3_SetXP(g_T, race, 0);
+    War3_SetGold(g_T, 0);
+    PrintToServer("w3t_kill: race %d, start lvl %d xp %d gold %d", race, War3_GetLevel(g_T, race), War3_GetXP(g_T, race), War3_GetGold(g_T));
+    CreateTimer(1.5, Timer_Kill, race, TIMER_REPEAT);
+    return Plugin_Handled;
+}
+
+void Cmd_Matrix_FindBots()
+{
+    g_T = g_CT = 0;
+    for (int i = 1; i <= MaxClients; i++)
+    {
+        if (!IsClientInGame(i) || !IsFakeClient(i) || IsClientSourceTV(i))
+            continue;
+        if (GetClientTeam(i) == 2) g_T = i;
+        else if (GetClientTeam(i) == 3) g_CT = i;
+    }
+}
+
+public Action Timer_Kill(Handle timer, int race)
+{
+    if (!IsClientInGame(g_T) || !IsClientInGame(g_CT))
+        return Plugin_Stop;
+    if (!IsPlayerAlive(g_T)) CS_RespawnPlayer(g_T);
+    if (!IsPlayerAlive(g_CT)) CS_RespawnPlayer(g_CT);
+    FaceToFace();
+    SetEntProp(g_CT, Prop_Send, "m_ArmorValue", 0);
+    SetEntityHealth(g_CT, 10);
+    float hitpos[3];
+    GetClientEyePosition(g_CT, hitpos);
+    int weapon = GetEntPropEnt(g_T, Prop_Send, "m_hActiveWeapon");
+    SDKHooks_TakeDamage(g_CT, g_T, g_T, 50.0, DMG_BULLET, weapon, view_as<float>({100.0, 0.0, 0.0}), hitpos, false);
+    CreateTimer(0.5, Timer_KillReport, race);
+    if (--g_KillsLeft <= 0)
+        return Plugin_Stop;
+    return Plugin_Continue;
+}
+
+public Action Timer_KillReport(Handle timer, int race)
+{
+    PrintToServer("w3t_kill: CT alive %d -> T lvl %d xp %d gold %d", IsPlayerAlive(g_CT), War3_GetLevel(g_T, race), War3_GetXP(g_T, race), War3_GetGold(g_T));
+    return Plugin_Stop;
+}
+
+public Action Cmd_Set(int args)
+{
+    if (args < 5)
+    {
+        PrintToServer("w3t_set <client> <race> <level> <xp> <gold>");
+        return Plugin_Handled;
+    }
+    char arg[16];
+    int v[5];
+    for (int i = 0; i < 5; i++)
+    {
+        GetCmdArg(i + 1, arg, sizeof(arg));
+        v[i] = StringToInt(arg);
+    }
+    War3_SetRace(v[0], v[1]);
+    War3_SetLevel(v[0], v[1], v[2]);
+    War3_SetXP(v[0], v[1], v[3]);
+    War3_SetGold(v[0], v[4]);
+    // one point in each skill except the ultimate (it needs a minimum level)
+    for (int s = 1; s <= War3_GetRaceSkillCount(v[1]) && s <= v[2]; s++)
+        if (!War3_IsSkillUltimate(v[1], s))
+            War3_SetSkillLevelINTERNAL(v[0], v[1], s, 1);
+    PrintToServer("w3t_set: done");
+    return Plugin_Handled;
 }

@@ -210,8 +210,8 @@ public OnPluginStart()
 
 War3Source_InitCVars()
 {
-    introclannamecvar = CreateConVar("war3_introclanname", "war3_introclanname", "Intro menu clan name (welcome to 'YOUR CLAN NAME' War3Source server!)");
-    clanurl = CreateConVar("war3_clanurl", "www.ownageclan.Com (set war3_clanurl)", "The url to display on intro menu");
+    introclannamecvar = CreateConVar("war3_introclanname", "", "Intro menu clan name (welcome to 'YOUR CLAN NAME' War3Source server!), the server name if empty");
+    clanurl = CreateConVar("war3_clanurl", "", "The url to display on intro menu (none if empty)");
     hChangeGameDescCvar = CreateConVar("war3_game_desc", "1", "change game description to war3source? does not affect player connect");
 
     hLoadWar3CFGEveryMapCvar = CreateConVar("war3_load_war3source_cfg_every_map", "1", "May help speed up map changes if disabled.");
@@ -550,8 +550,12 @@ War3Source_IntroMenu(client)
 {
     new Handle:introMenu = CreateMenu(War3Source_IntroMenu_Select);
 
-    new String:clanname[32];
+    new String:clanname[64];
     GetConVarString(introclannamecvar, clanname, sizeof(clanname));
+    if(!clanname[0])
+    {
+        GetConVarString(FindConVar("hostname"), clanname, sizeof(clanname));
+    }
 
     new String:welcome[512];
 
@@ -584,7 +588,7 @@ War3Source_IntroMenu(client)
         AddMenuItem(introMenu, "exit", buf);
     }
 
-    Format(buf, sizeof(buf), "www.war3source.com");
+    Format(buf, sizeof(buf), "github.com/War3Source/War3Source");
     AddMenuItem(introMenu, "exit", buf);
     DisplayMenu(introMenu, client, MENU_TIME_FOREVER);
 }

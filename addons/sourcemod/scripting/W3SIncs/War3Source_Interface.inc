@@ -1793,7 +1793,7 @@ stock War3_GetHintSound(String:sSoundFile[], maxlength)
   }
   else
   {
-    strcopy(sSoundFile, maxlength, "UI/hint.wav");
+    strcopy(sSoundFile, maxlength, "ui/hint.wav");
   }
 }
 

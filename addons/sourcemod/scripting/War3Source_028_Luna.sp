@@ -86,9 +86,10 @@ public OnWar3LoadRaceOrItemOrdered(num)
         ULT=War3_AddRaceSkillT(thisRaceID,"Eclipse",true,4);
         War3_CreateRaceEnd(thisRaceID);
         
+        // false: the blessing is for Luna's teammates (true gave the bonus damage to nearby enemies)
         War3_AddAuraSkillBuff(thisRaceID, SKILL_AURA, iDamageBonus, BlessingIncrease, 
                               "luna_blessing", BlessingRadius, 
-                              true);
+                              false);
         
         // since we cant look up aura ids by shortname right now, do it this way ;)
         AuraID = W3RegisterAura("luna_blessing", BlessingRadius);

@@ -44,6 +44,14 @@ stock bool:War3_AddCustomSound(const String:sound[], bool:precache = true, bool:
         }
         
     } 
+    else if (FileExists(path, true))
+    {
+        // Stock game sound (inside the game's VPK files): every client has it, nothing to download
+        if (precache)
+        {
+            return PrecacheSoundAny(sound, preload);
+        }
+    }
     else 
     {
         War3_LogError("Sound file \"%s\" not found", path);
@@ -72,6 +80,14 @@ stock War3_AddCustomModel(const String:model[], bool:precache = true, bool:prelo
         }
         
     } 
+    else if (FileExists(model, true))
+    {
+        // Stock game model (inside the game's VPK files): nothing to download
+        if (precache)
+        {
+            return PrecacheModel(model, preload);
+        }
+    }
     else 
     {
         ThrowError("Model file \"%s\" not found", model);
