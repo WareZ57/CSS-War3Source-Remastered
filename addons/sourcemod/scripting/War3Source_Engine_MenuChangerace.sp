@@ -278,26 +278,7 @@ War3Source_ChangeRaceMenu(client,bool:forceUncategorized=false)
                 Format(rbuf,sizeof(rbuf),"%d",x); //DATA FOR MENU!
 
                 War3_GetRaceName(x,rname,sizeof(rname));
-                new yourteam,otherteam;
 
-                for(new y=1;y<=MaxClients;y++)
-                {
-
-                    if(ValidPlayer(y,false))
-                    {
-                        if(War3_GetRace(y)==x)
-                        {
-                            if(GetClientTeam(client)==GetClientTeam(y))
-                            {
-                                ++yourteam;
-                            }
-                            else
-                            {
-                                ++otherteam;
-                            }
-                        }
-                    }
-                }
                 new String:extra[3];
                 if(War3_GetRace(client)==x)
                 {
@@ -373,25 +354,7 @@ public War3Source_CRMenu_SelCat(Handle:menu,MenuAction:action,client,selection)
                     if(strcmp(sItem, rcvar, false)==0) {
                         IntToString(x,rbuf,sizeof(rbuf)); //menudata as string
                         War3_GetRaceName(x,rname,sizeof(rname));
-                        decl String:extra[3],yourteam,otherteam;
-                        for(new y=1;y<=MaxClients;y++)
-                        {
-
-                            if(ValidPlayer(y,false))
-                            {
-                                if(War3_GetRace(y)==x)
-                                {
-                                    if(GetClientTeam(client)==GetClientTeam(y))
-                                    {
-                                        ++yourteam;
-                                    }
-                                    else
-                                    {
-                                        ++otherteam;
-                                    }
-                                }
-                            }
-                        }
+                        decl String:extra[3];
                         strcopy(extra, sizeof(extra), "");
                         if(War3_GetRace(client)==x)
                         {

@@ -4,6 +4,7 @@
 #include <sdkhooks>
 #include <cstrike>
 #include "W3SIncs/War3Source_Interface"
+#include "W3SIncs/War3Source_Bots"
 
 public Plugin myinfo =
 {
@@ -20,6 +21,7 @@ public void OnPluginStart()
     RegServerCmd("w3t_items", Cmd_Matrix, "Tests every shop item with two frozen bots");
     RegServerCmd("w3t_cmds", Cmd_Cmds, "Runs every War3Source chat command as a bot");
     RegServerCmd("w3t_kill", Cmd_Kill, "The T bot kills the CT bot: XP, gold and level up");
+    RegServerCmd("w3t_pick", Cmd_Pick, "Bot race pick + skill distribution, skills printed right after and 0.5 s later");
     RegServerCmd("w3t_set", Cmd_Set, "w3t_set <client> <race> <level> <xp> <gold>: sets a player's War3Source data");
 }
 
@@ -44,6 +46,9 @@ public Action Cmd_Status(int args)
             War3_GetRaceShortname(r, race, sizeof(race));
             for (int s = 1; s <= War3_GetRaceSkillCount(r); s++)
                 Format(skills, sizeof(skills), "%s%d", skills, War3_GetSkillLevel(i, r, s));
+            StrCat(skills, sizeof(skills), "/");
+            for (int s = 1; s <= War3_GetRaceSkillCount(r); s++)
+                Format(skills, sizeof(skills), "%s%d", skills, War3_GetSkillLevelINTERNAL(i, r, s));
         }
         bool alive = IsPlayerAlive(i);
         PrintToServer("%2d %-16s t%d %s %-10s lvl%2d sk[%s] xp%5d gold%3d hp%4d spd%.2f grav%.2f alpha%3d",
@@ -488,4 +493,40 @@ public Action Cmd_Set(int args)
             War3_SetSkillLevelINTERNAL(v[0], v[1], s, 1);
     PrintToServer("w3t_set: done");
     return Plugin_Handled;
+}
+
+void PickSkillString(int client, char[] buf, int len)
+{
+    int r = War3_GetRace(client);
+    Format(buf, len, "race %d lvl %d sk ", r, War3_GetLevel(client, r));
+    for (int s = 1; s <= War3_GetRaceSkillCount(r); s++)
+        Format(buf, len, "%s%d", buf, War3_GetSkillLevelINTERNAL(client, r, s));
+}
+
+public Action Cmd_Pick(int args)
+{
+    char buf[64];
+    for (int i = 1; i <= MaxClients; i++)
+    {
+        if (!IsClientInGame(i) || !IsFakeClient(i))
+            continue;
+        War3_bots_pickrace(i);
+        PickSkillString(i, buf, sizeof(buf));
+        PrintToServer("%2d now   %s", i, buf);
+    }
+    CreateTimer(0.5, Timer_PickLater);
+    return Plugin_Handled;
+}
+
+public Action Timer_PickLater(Handle timer)
+{
+    char buf[64];
+    for (int i = 1; i <= MaxClients; i++)
+    {
+        if (!IsClientInGame(i) || !IsFakeClient(i))
+            continue;
+        PickSkillString(i, buf, sizeof(buf));
+        PrintToServer("%2d later %s", i, buf);
+    }
+    return Plugin_Stop;
 }

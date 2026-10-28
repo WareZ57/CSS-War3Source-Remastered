@@ -2,32 +2,43 @@
 
 ## Supported Games ##
 
-The following games are currently supported by War3Source:
-
-* Great support
- * Team Fortress 2
- * Counter-Strike Source
- * Counter-Strike: Global Offensive
-
-* Engine support
- * Left 4 Dead
- * Left 4 Dead 2
+* Counter-Strike: Source (tested with the 2025 version of the game, SourceMod 1.12)
+* Team Fortress 2, Counter-Strike: Global Offensive, Left 4 Dead 1 and 2: the code is kept and compiles, but was
+  not tested with current versions of these games.
 
 If you plan to run War3Source with a Left4Dead game you will have to get custom tailored races and shopitems as the stock ones are not suited for Left4Dead gameplay
 
 ## Requirements ##
 
-* A Gameserver with a supported game
- * A recent Sourcemod snapshot (http://www.sourcemod.net/snapshots.php, at least from the 1.5 branch)
- * A recent Metamod snapshot (http://www.sourcemm.net/snapshots, at least from the 1.10 branch)
- * Sourcemod configured to use a database (sqlite is fine)
+* Metamod:Source 1.12 or later (https://www.metamodsource.net/downloads.php?branch=stable)
+* SourceMod 1.12 or later (https://www.sourcemod.net/downloads.php?branch=stable)
+* Optional: the SteamWorks extension (https://github.com/KyleSanderson/SteamWorks/releases), only for the Clan
+  Bonus XP addon with `war3_bonusclan_id`
 
 ## Installation guide ##
 
-* If you don't know anything about compiling the source manually you can grab a compiled build from our build server at http://ownageclan.com/jenkins/job/War3Source-Default1/
+1. Build the package (or take it from a release):
 
-* Simply put the addons folder into your game folder where Source- and Metamod should have already created a addons folder
-* The sound folder belongs into your games sound folder as well as on your fastdl server
-* The optional folder contains various things that are not necessary for a base installation
+       SPCOMP=/path/to/sourcemod/scripting/spcomp64 tools/build.sh
 
-#test change 1
+2. Copy the content of `build/package` (`addons`, `cfg`, `sound`) into the server's `cstrike` folder, where
+   Metamod and SourceMod already created an `addons` folder.
+3. Put the `sound/war3source` folder on your fastdl server as well, if you use one.
+4. Restart the server.
+
+`addons/sourcemod/plugins/disabled` contains the plugins for other games (TF2, Left 4 Dead): leave them there on
+Counter-Strike: Source.
+
+## Database ##
+
+War3Source saves XP in the database set by `"database"` in `addons/sourcemod/configs/war3source.ini` (an entry of
+SourceMod's `configs/databases.cfg`). With `"default"`, it uses SourceMod's `default` entry; if that database cannot
+be reached (out of the box it is MySQL on localhost), War3Source uses SourceMod's local SQLite database
+(`storage-local`, file `addons/sourcemod/data/sqlite/sourcemod-local.sq3`) and says so in the server console.
+
+## Settings ##
+
+`cfg/war3source.cfg` is executed at every map start and lists every setting with its default value, commented
+out. Race skill settings (cooldowns...) are listed by `cvarlist war3_`.
+
+The `optional` folder contains various things that are not necessary for a base installation.

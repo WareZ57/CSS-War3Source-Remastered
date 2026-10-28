@@ -250,15 +250,15 @@ public DistributeSkillPoints(client)
     new skillpoints = level;
     new ultLevel = W3GetMinUltLevel();
 
-    // Subtract already spent skillpoints
-    for(new i=0; i < War3_GetRaceSkillCount(race); i++)
+    // Subtract already spent skillpoints (skills are numbered from 1)
+    for(new i=1; i <= War3_GetRaceSkillCount(race); i++)
     {
         skillpoints -= War3_GetSkillLevel(client, race, i);
     }
     
     if(skillpoints < 0)
     {
-        for(new i=0; i < War3_GetRaceSkillCount(race); i++)
+        for(new i=1; i <= War3_GetRaceSkillCount(race); i++)
         {
             War3_SetSkillLevelINTERNAL(client, race, i, 0);     // Reset all skill points to zero
         }
@@ -278,7 +278,7 @@ public DistributeSkillPoints(client)
         {
             //PrintToServer("Applying skill points to bot (Attempt %i)", attempts);
             
-            skill = GetRandomInt(0, War3_GetRaceSkillCount(race));
+            skill = GetRandomInt(1, War3_GetRaceSkillCount(race));
             skill_level = War3_GetSkillLevel(client, race, skill);
             skill_max_level = W3GetRaceSkillMaxLevel(race, skill);
             attempts++;
@@ -295,12 +295,14 @@ public DistributeSkillPoints(client)
                 //PrintToServer("STOPPING BECAUSE 2");
                 continue;
             }
-            else if(skill_level * 2 > level + 1)
+            // Same limits as the level check of War3Source_Engine_XPGold, applied to the level the skill
+            // would reach: a skill above them makes War3Source clear every skill of the player
+            else if((skill_level + 1) * 2 > level + 1)
             {
                 //PrintToServer("STOPPING BECAUSE 3");
                 continue;
             }
-            else if(War3_IsSkillUltimate(race, skill) && (skill_level > 0) && ((skill_level * 2 + ultLevel -1) > (level + 1)))
+            else if(War3_IsSkillUltimate(race, skill) && (((skill_level + 1) * 2 + ultLevel -1) > (level + 1)))
             {
                 //PrintToServer("STOPPING BECAUSE 4");
                 continue;

@@ -270,7 +270,7 @@ public OnUltimateCommand(client,race,bool:pressed)
                         ThrowAwayParticle("molotov_explosion", effect_vec, 3.5, effect_angles);
                     } else if(GAMECS) {
                         //I'm unsure about how it works in other games than cs:source
-                        effect_vec[2]-180;
+                        effect_vec[2]-=150.0; // back to the feet (the particle follows the foot attachment anyway)
                         new ent = AttachParticle(target, "env_fire_medium_smoke", effect_vec, "rfoot");
                         FireEntityEffect[target]=ent;
                     }
