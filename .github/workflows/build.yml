@@ -1,0 +1,44 @@
+name: Build
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    env:
+      SM_BUILD: 1.12.0-git7259
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: SourceMod 1.12
+        run: curl -fsSL "https://sm.alliedmods.net/smdrop/1.12/sourcemod-${SM_BUILD}-linux.tar.gz" | tar xz -C "$RUNNER_TEMP"
+
+      # Plugins built with SourceMod 1.12 load on 1.12 and later (1.13 builds do not load on 1.12)
+      - name: Build the CS:S package
+        run: SPCOMP="$RUNNER_TEMP/addons/sourcemod/scripting/spcomp64" tools/build.sh
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: War3Source-CSS-package
+          path: build/package
+
+  compile_sourcemod_1_13:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: SourceMod 1.13 (development branch)
+        run: |
+          latest=$(curl -fsSL https://sm.alliedmods.net/smdrop/1.13/sourcemod-latest-linux)
+          curl -fsSL "https://sm.alliedmods.net/smdrop/1.13/${latest}" | tar xz -C "$RUNNER_TEMP"
+
+      - name: Compile with SourceMod 1.13
+        run: SPCOMP="$RUNNER_TEMP/addons/sourcemod/scripting/spcomp64" tools/build.sh
+
+      - name: Compile the test plugin
+        run: |
+          "$RUNNER_TEMP/addons/sourcemod/scripting/spcomp64" test/w3s_verify.sp -iaddons/sourcemod/scripting \
+            -iaddons/sourcemod/scripting/W3SIncs -o"$RUNNER_TEMP/w3s_verify.smx"

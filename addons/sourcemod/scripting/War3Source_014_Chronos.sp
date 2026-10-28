@@ -350,11 +350,7 @@ public Action:sphereLoop(Handle:h,any:client){
     
 }
 public Action:unBashUlt(Handle:h,any:client){
-    if(RaceDisabled)
-    {
-        return;
-    }
-
+    // Always runs, even if the race was disabled meanwhile: it ends the effect
     War3_SetBuff(client,bBashed,thisRaceID,false);
     War3_SetBuff(client,fAttackSpeed,thisRaceID,1.0);
     bTrapped[client]=false;
@@ -363,11 +359,7 @@ public Action:unBashUlt(Handle:h,any:client){
     
 }
 public Action:sphereend(Handle:h,any:client){
-    if(RaceDisabled)
-    {
-        return;
-    }
-
+    // Always runs, even if the race was disabled meanwhile: it ends the effect
     hasSphere[client]=false;
     
 }

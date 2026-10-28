@@ -46,11 +46,12 @@ ConnectDB()
     {
         hDB = SQL_Connect(sDBConnect, true, sError, sizeof(sError));
     }
-    if(!hDB && !StrEqual(sDBConnect, "storage-local", false))
+    if(!hDB && (StrEqual(sDBConnect, "", false) || StrEqual(sDBConnect, "default", false)))
     {
         // Out of the box, SourceMod's "default" database is MySQL on localhost, which most servers don't have:
-        // fall back to SourceMod's local SQLite database so that XP is saved anyway
-        // Expected on a fresh install: a normal log message, not an error
+        // fall back to SourceMod's local SQLite database so that XP is saved anyway.
+        // Only for "default": a database named in war3source.ini never falls back (no silent switch when a
+        // real MySQL server is briefly down). Expected on a fresh install: a normal log message, not an error
         LogMessage("Could not connect to database \"%s\" (%s), using SourceMod's local SQLite database (\"storage-local\") instead. Set \"database\" in configs/war3source.ini to choose another one.", sDBConnect, sError);
         PrintToServer("[War3Source] Database \"%s\" unavailable, using SourceMod's local SQLite database (\"storage-local\")", sDBConnect);
         strcopy(sDBConnect, sizeof(sDBConnect), "storage-local");
@@ -84,8 +85,11 @@ ConnectDB()
 
         if(g_SQLType == SQLType_MySQL)
         {
-            // utf8mb4: player names may contain any character
-            SQL_SetCharset(hDB, "utf8mb4");
+            // utf8mb4: player names may contain any character (tables are created in utf8mb4 too)
+            if(!SQL_SetCharset(hDB, "utf8mb4"))
+            {
+                War3_LogError("Could not set the MySQL connection character set to utf8mb4");
+            }
         }
         
         W3SetVar(hDatabase, hDB);

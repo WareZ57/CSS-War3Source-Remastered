@@ -11,7 +11,7 @@ public Plugin:myinfo =
     name = "War3Source - Addon - Ammo Control",
     author = "War3Source Team",
     description = "",
-    url = "http://war3source.com/index.php?topic=525.0"
+    url = "https://github.com/War3Source/War3Source"
 };
 
 #define PLUGIN_VERSION "1.0"

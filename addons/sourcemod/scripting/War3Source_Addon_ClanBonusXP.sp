@@ -87,11 +87,11 @@ public OnWar3Event(W3EVENT:event,client)
 {
     if(event==OnPreGiveXPGold && !IsFakeClient(client)) {
         new bool:bAwardBonus = false;
-        // SteamWorks has highest priority
-        if(check_steamworks()) {
+        // SteamWorks has highest priority, when a group is set
+        if(check_steamworks() && GetConVarInt(g_hClanID) != 0) {
             bAwardBonus = bIsInGroup[client];
         }
-        // Check clantag if SteamWorks isn't available and bonus isn't granted yet
+        // Otherwise check the clan tag
         else if(GAMECSANY && !bAwardBonus) {
             decl String:buffer[32],String:buffer2[32];
             CS_GetClientClanTag(client,buffer, sizeof(buffer));

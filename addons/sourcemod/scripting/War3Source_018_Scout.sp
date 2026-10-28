@@ -181,11 +181,7 @@ public OnAbilityCommand(client,ability,bool:pressed)
 }
 public Action:EndInvis(Handle:timer,any:client)
 {
-    if(RaceDisabled)
-    {
-        return;
-    }
-
+    // Always runs, even if the race was disabled meanwhile: it ends the effect
     InInvis[client]=false;
     War3_SetBuff(client,fInvisibilitySkill,thisRaceID,1.0);
     War3_SetBuff(client,fHPDecay,thisRaceID,0.0);
@@ -194,11 +190,7 @@ public Action:EndInvis(Handle:timer,any:client)
     
 }
 public Action:EndInvis2(Handle:timer,any:client){
-    if(RaceDisabled)
-    {
-        return;
-    }
-
+    // Always runs, even if the race was disabled meanwhile: it ends the effect
     War3_SetBuff(client,bDisarm,thisRaceID,false);
     bDisarmed[client]=false;
 }

@@ -126,11 +126,7 @@ public OnW3TakeDmgBulletPre(victim,attacker,Float:damage)
 
 public Action:UnSmitten(Handle:timer,any:client)
 {
-    if(RaceDisabled)
-    {
-        return;
-    }
-
+    // Always runs, even if the race was disabled meanwhile: it ends the effect
     bSmittened[client]=false;
 }
 
@@ -245,11 +241,7 @@ Sleep(client){
 }
 
 public Action:EndSleep(Handle:t,any:client){
-    if(RaceDisabled)
-    {
-        return;
-    }
-
+    // Always runs, even if the race was disabled meanwhile: it ends the effect and clears the timer handle
     SleepTimer[client]=INVALID_HANDLE;
     CloseHandle(SleepHandle[client]);
     SleepHandle[client]=INVALID_HANDLE;
@@ -257,11 +249,6 @@ public Action:EndSleep(Handle:t,any:client){
     UnSleep(client);
 }
 UnSleep(client){
-    if(RaceDisabled)
-    {
-        return;
-    }
-
     War3_SetBuff(client,bStunned,thisRaceID,false);
     PrintHintText(client,"%T","No Longer Mesmerized",client);
 }

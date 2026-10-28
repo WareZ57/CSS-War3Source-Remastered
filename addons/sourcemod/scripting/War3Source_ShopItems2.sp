@@ -76,7 +76,7 @@ public Plugin:myinfo =
   author = "Ownz",
   description = "The shop items that come with War3Source.",
   version = "1.0.0.0",
-  url = "http://war3source.com/"
+  url = "https://github.com/War3Source/War3Source"
 };
 
 public OnPluginStart()

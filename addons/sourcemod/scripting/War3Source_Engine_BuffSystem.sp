@@ -293,6 +293,11 @@ ResetBuff(client,W3Buff:buffindex){
 ResetBuffParticularRaceOrItem(client,W3Buff:buffindex,particularraceitemindex){
   if(ValidBuff(buffindex))
   {
+    // already at its default value: nothing to recalculate (W3ResetAllBuffRace calls this for every buff)
+    if(buffdebuff[client][buffindex][particularraceitemindex]==BuffDefault(buffindex))
+    {
+      return;
+    }
     buffdebuff[client][buffindex][particularraceitemindex]=BuffDefault(buffindex);
     
     DoCalculateBuffCache(client,buffindex,particularraceitemindex);

@@ -101,11 +101,7 @@ public OnUltimateCommand(client,race,bool:pressed)
     }            
 }
 public Action:EndNotBad(Handle:t,any:client){
-    if(RaceDisabled)
-    {
-        return;
-    }
-
+    // Always runs, even if the race was disabled meanwhile: it ends the effect
     bNoDamage[client]=false;
 }
 public OnW3TakeDmgBulletPre(victim,attacker,Float:damage){
@@ -158,11 +154,7 @@ public OnAbilityCommand(client,ability,bool:pressed)
     }
 }
 public Action:EndStare(Handle:t,any:client){
-    if(RaceDisabled)
-    {
-        return;
-    }
-
+    // Always runs, even if the race was disabled meanwhile: it ends the effect
     War3_SetBuff(client,bBashed,thisRaceID,false);
     War3_SetBuff(client,bDisarm,thisRaceID,false);
     War3_SetBuff(StareVictim[client],bBashed,thisRaceID,false);

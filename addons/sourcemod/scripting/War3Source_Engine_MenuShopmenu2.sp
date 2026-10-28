@@ -13,7 +13,7 @@ public Plugin:myinfo=
   author="Ownz (DarkEnergy)",
   description="War3Source Core Plugins",
   version="1.0",
-  url="http://war3source.com/"
+  url="https://github.com/War3Source/War3Source"
 };
 
 

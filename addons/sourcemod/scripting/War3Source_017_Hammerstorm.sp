@@ -274,11 +274,7 @@ public OnUltimateCommand(client,race,bool:pressed)
 
 
 public Action:stopUltimate(Handle:t,any:client){
-    if(RaceDisabled)
-    {
-        return;
-    }
-
+    // Always runs, even if the race was disabled meanwhile: it ends the effect
     bStrengthActivated[client] = false;
     if(ValidPlayer(client,true)){
         PrintHintText(client,"%T","You feel less powerful",client);

@@ -30,5 +30,5 @@ hit later, since some skills act after a delay (thorns: 0.1 s).
 ## Results (CS:S 2025, SourceMod 1.12.0.7259)
 
 - 22 races, 17 shop items, 34 chat commands: no error.
-- 8 minutes with 10 bots (random races and levels, items, ultimates): no error.
+- 8 minutes with 10 bots, races and levels scrambled every round, items, ultimates: no error.
 - XP saved and loaded with SQLite: race, level, XP, gold and skills.

@@ -8,7 +8,7 @@ public Plugin:myinfo =
     name = "War3Source - Addon - Halloween Boss Horseman XP/Gold",
     author = "War3Source Team",
     description = "Awards players for killing the headless horseman",
-    url = "http://war3source.com/index.php?topic=1553.0"
+    url = "https://github.com/War3Source/War3Source"
 };
 
 // TF only.

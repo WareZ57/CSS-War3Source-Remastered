@@ -97,11 +97,7 @@ public OnAbilityCommand(client,ability,bool:pressed)
 }
 
 public Action:EndSpeed(Handle:t, any:client){
-    if(RaceDisabled)
-    {
-        return;
-    }
-
+    // Always runs, even if the race was disabled meanwhile: it ends the effect and clears the timer handle
     if(GAMETF)
     {
         TF2_RemoveCondition(client, TFCond_SpeedBuffAlly);

@@ -192,11 +192,7 @@ public OnUltimateCommand(client,race,bool:pressed)
 
 public Action:EndVoodoo(Handle:timer,any:client)
 {
-    if(RaceDisabled)
-    {
-        return;
-    }
-
+    // Always runs, even if the race was disabled meanwhile: it ends the effect
     bVoodoo[client]=false;
     W3ResetPlayerColor(client,thisRaceID);
     if(ValidPlayer(client,true))

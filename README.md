@@ -3,6 +3,13 @@
 > **This version is updated for SourceMod 1.12 and Counter-Strike: Source as of 2025.** The upstream code no
 > longer compiled with current SourceMod; it now does, several gameplay bugs are fixed and XP is saved with
 > SQLite out of the box. See [CHANGELOG.md](CHANGELOG.md) and [INSTALLATION.md](INSTALLATION.md).
+>
+> **Install:** download `War3Source-CSS-SM1.12.zip` from the
+> [latest release](https://github.com/WareZ57/CSS-War3Source-Remastered/releases/latest) and drop its content into
+> your server's `cstrike` folder (Metamod:Source and SourceMod 1.12 or later required).
+>
+> War3Source was created by Anthony Iacono ("pimpinjuice"), then led by Yi (Derek) Luo ("Ownz", DarkEnergy) and the
+> War3Source community (see below); their history is kept in this repository.
 
 War3Source  brings the Warcraft 3 leveling style and races into the game.
 It is originally based on the amxmodx (AMX) version War3FT.

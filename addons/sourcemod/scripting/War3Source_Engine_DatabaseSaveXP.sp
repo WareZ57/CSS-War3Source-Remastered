@@ -78,7 +78,7 @@ Initialize_SQLTable()
         if(query == INVALID_HANDLE)
         {
             new String:createtable[3000];
-            Format(createtable, sizeof(createtable), "CREATE TABLE war3source (steamid varchar(64) UNIQUE, name varchar(64), currentrace varchar(16), gold int, diamonds int, total_level int, total_xp int, levelbankV2 int, last_seen int) %s", War3SQLType:W3GetVar(hDatabaseType) == SQLType_MySQL ? "DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci" : "" );
+            Format(createtable, sizeof(createtable), "CREATE TABLE war3source (steamid varchar(64) UNIQUE, name varchar(64), currentrace varchar(16), gold int, diamonds int, total_level int, total_xp int, levelbankV2 int, last_seen int) %s", War3SQLType:W3GetVar(hDatabaseType) == SQLType_MySQL ? "DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci" : "" );
             if(!SQL_FastQueryLogOnError(hDB, createtable) ||
                !SQL_FastQueryLogOnError(hDB, "CREATE UNIQUE INDEX war3_steamid ON war3source (steamid)"))
             {
@@ -120,7 +120,7 @@ Initialize_SQLTable()
         {
             PrintToServer("[War3Source] war3source_racedata1 doesnt exist, creating");
             new String:longquery2[4000];
-            Format(longquery2, sizeof(longquery2), "CREATE TABLE war3source_racedata1 (steamid varchar(64), raceshortname varchar(16), level int, xp int, last_seen int)  %s",War3SQLType:W3GetVar(hDatabaseType)==SQLType_MySQL?"DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci":"");
+            Format(longquery2, sizeof(longquery2), "CREATE TABLE war3source_racedata1 (steamid varchar(64), raceshortname varchar(16), level int, xp int, last_seen int)  %s",War3SQLType:W3GetVar(hDatabaseType)==SQLType_MySQL?"DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci":"");
 
             if(!SQL_FastQueryLogOnError(hDB, longquery2) ||
                !SQL_FastQueryLogOnError(hDB, "CREATE UNIQUE INDEX war3_race_steamid_shortname ON war3source_racedata1 (steamid, raceshortname)") ||
